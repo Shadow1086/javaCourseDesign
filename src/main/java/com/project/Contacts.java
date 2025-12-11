@@ -1,0 +1,71 @@
+package com.project;
+/**
+ * ClassName: Contacts
+ * Description: 
+ * 
+ * 通讯录中联系人对象
+ * 
+ * {@code @Author} Liang-ht
+ * {@code @Create} 2025-12-09 19:53:55
+ */
+public class Contacts {
+    private int id;
+    private String name;
+    private String tele1;
+    private String tele2;
+    private String home;
+    private String email;
+    private String notes;
+    
+    public Contacts(String name, String tele1, String tele2, String home, String email, String notes) {
+        this.name = name;
+        this.tele1 = tele1;
+        this.tele2 = tele2;
+        this.home = home;
+        this.email = email;
+        this.notes = notes;
+    }
+    public int getId() {
+        return id;
+    }
+    // public void setId(int id) {
+    //     this.id = id;
+    // }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getTele1() {
+        return tele1;
+    }
+    public void setTele1(String tele1) {
+        this.tele1 = tele1;
+    }
+    public String getTele2() {
+        return tele2;
+    }
+    public void setTele2(String tele2) {
+        this.tele2 = tele2;
+    }
+    public String getHome() {
+        return home;
+    }
+    public void setHome(String home) {
+        this.home = home;
+    }
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    public String getNotes() {
+        return notes;
+    }
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+    
+}
