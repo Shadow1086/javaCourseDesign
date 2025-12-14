@@ -16,15 +16,25 @@ public interface ContactService {
     * 添加联系人，调用DAO中的insert方法
      * @param name,tele1,tele2,home,email,notes
     */
-    public void addContact(String name,String tele1,String tele2,String home,String email,String notes);
+    void addContact(String name, String tele1, String tele2, String home, String email, String notes);
 
     /**
     * 通过ID查询联系人
     */
-    public Contacts findId(int id);
+    Contacts findId(int id);
 
     /**
     * 通过姓名查询联系人
     */
-    public List<Contacts> findName(String name);
+    List<Contacts> findName(String name);
+
+    /**
+     * 根据ID删除联系人
+     */
+    void deleteId(int id);
+
+    /**
+     * 根据ID来更改联系人信息
+     */
+    boolean updateContactInfo(int id, String newName, String newTele1, String newTele2, String newHome, String newEmail, String newNotes);
 }
