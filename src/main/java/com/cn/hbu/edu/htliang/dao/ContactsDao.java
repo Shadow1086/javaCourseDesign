@@ -24,12 +24,11 @@ public interface ContactsDao {
 
     // Update : 更新数据
     void update(Contacts contact);
-    void updatePhone(int id , String newPhone);
+    void updateInfo(int id ,String newName,String newTele1,String newTele2,String newHome,String newEmail,String newNotes);
 
     //delete : 删除数据
     void deleteById(int id);
-    void deleteByName(String name);
     //其他操作
     boolean exists(int id);     //判断是否存在此对象
-    public int returnId(Contacts con);
+//    int returnId(Contacts con);
 }
