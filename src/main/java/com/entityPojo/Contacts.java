@@ -1,4 +1,4 @@
-package com.project;
+package com.entityPojo;
 /**
  * ClassName: Contacts
  * Description: 
@@ -9,13 +9,15 @@ package com.project;
  * {@code @Create} 2025-12-09 19:53:55
  */
 public class Contacts {
-    private int id;
+    private Integer id;
     private String name;
     private String tele1;
     private String tele2;
     private String home;
     private String email;
     private String notes;
+
+    public Contacts(){}
     
     public Contacts(String name, String tele1, String tele2, String home, String email, String notes) {
         this.name = name;
@@ -25,6 +27,17 @@ public class Contacts {
         this.email = email;
         this.notes = notes;
     }
+
+    public Contacts(Integer id, String name, String tele1, String tele2, String home, String email, String notes) {
+        this.id = id;
+        this.name = name;
+        this.tele1 = tele1;
+        this.tele2 = tele2;
+        this.home = home;
+        this.email = email;
+        this.notes = notes;
+    }
+
     public int getId() {
         return id;
     }
@@ -67,5 +80,16 @@ public class Contacts {
     public void setNotes(String notes) {
         this.notes = notes;
     }
-    
+
+    @Override
+    public String toString() {
+        return "Contacts{" +
+                "name='" + name + '\'' +
+                ", tele1='" + tele1 + '\'' +
+                ", tele2='" + tele2 + '\'' +
+                ", home='" + home + '\'' +
+                ", email='" + email + '\'' +
+                ", notes='" + notes + '\'' +
+                '}';
+    }
 }
