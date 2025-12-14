@@ -13,21 +13,29 @@ import java.util.List;
  */
 public interface ContactService {
     /**
-    * 添加联系人，调用DAO中的insert方法
+     * 添加联系人，调用DAO中的insert方法
+     *
      * @param name,tele1,tele2,home,email,notes
-    */
+     */
     void addContact(String name, String tele1, String tele2, String home, String email, String notes);
 
     /**
-    * 通过ID查询联系人
-    */
+     * 通过ID查询联系人
+     */
     Contacts findId(int id);
 
     /**
-    * 通过姓名查询联系人
+    * 查询所有联系人
     */
+    List<Contacts> findAll();
+    /**
+     * 通过姓名查询联系人
+     */
     List<Contacts> findName(String name);
-
+    /**
+    * 通过手机号查询
+    */
+    List<Contacts> findTele(String tele);
     /**
      * 根据ID删除联系人
      */

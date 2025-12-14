@@ -3,6 +3,7 @@ package com.cn.hbu.edu.htliang.service;
 import com.cn.hbu.edu.htliang.dao.ContactsDaoImpl;
 import com.cn.hbu.edu.htliang.entityPojo.Contacts;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ public class ContactServiceImpl implements ContactService {
     private final ContactsDaoImpl dao = new ContactsDaoImpl();
 
     /**
-     * 添加联系人
+     * 添加单个联系人
      * 姓名等所有信息都需要添加到形参，除了ID
      */
     @Override
@@ -45,7 +46,12 @@ public class ContactServiceImpl implements ContactService {
         }
         return null;
     }
-
+    /**
+    * 查询所有联系人
+    */
+    public List<Contacts> findAll(){
+        return dao.findAll();
+    }
     /**
      * 根据姓名查找联系人
      */
@@ -61,8 +67,22 @@ public class ContactServiceImpl implements ContactService {
     }
 
     /**
+    * 通过手机号查询
+    */
+    public List<Contacts> findTele(String tele){
+        if(tele.length()>11){
+            //TODO : 应该添加一个电话号格式的正则表达式
+            try {
+                throw new Exception("输入电话有误");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return dao.findByTele(tele);
+    }
+
+    /**
      * 根据ID删除联系人
-     *
      * @param id : 要删除的联系人的ID
      */
     @Override
