@@ -1,4 +1,4 @@
-package com.entityPojo;
+package com.cn.hbu.edu.htliang.entityPojo;
 /**
  * ClassName: Contacts
  * Description: 
@@ -38,12 +38,12 @@ public class Contacts {
         this.notes = notes;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
-    // public void setId(int id) {
-    //     this.id = id;
-    // }
+     public void setId(int id) {
+         this.id = id;
+     }
     public String getName() {
         return name;
     }

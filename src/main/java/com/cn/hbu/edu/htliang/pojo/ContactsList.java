@@ -1,7 +1,7 @@
-package com.pojo;
+package com.cn.hbu.edu.htliang.pojo;
 
-import com.entityPojo.Contacts;
-
+import com.cn.hbu.edu.htliang.util.DBUtil;
+import com.cn.hbu.edu.htliang.entityPojo.Contacts;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +23,9 @@ public class ContactsList {
      */
     public void InitDatabase() {
         try {
-            PreparedStatement ps = getConnection().prepareStatement("""
-                        create table if not exists Contacts(
-                            id int primary Key autoincrement,       -- 联系人ID，自动生成，从1开始递增
+            PreparedStatement ps = DBUtil.getConnection().prepareStatement("""
+                        create table if not exists Contacts_new(
+                            id integer primary Key autoincrement,       -- 联系人ID，自动生成，从1开始递增
                             name text not null ,                    -- 姓名，必填
                             tele1 varchar(11) not NULL,             -- 电话，必填
                             tele2 varchar(11),                      -- 备用电话
@@ -33,6 +33,15 @@ public class ContactsList {
                             email varchar(20),                      -- 电子邮件
                             notes text                              -- 备注
                         );
+                      -- 2. 复制数据（id 会自动重新生成）
+                      INSERT INTO Contacts_new (name, tele1, tele2, home, email, notes)
+                      SELECT name, tele1, tele2, home, email, notes FROM Contacts;
+                    
+                      -- 3. 删除旧表
+                      DROP TABLE Contacts;
+                    
+                      -- 4. 重命名新表
+                      ALTER TABLE Contacts_new RENAME TO Contacts;
                     """);
             if (!ps.execute()) {
                 System.out.println("初始化联系人表成功");
@@ -49,7 +58,7 @@ public class ContactsList {
      */
     public void tranformDatabaseClass() {
         try {
-            PreparedStatement ps = getConnection().prepareStatement("select * from Contacts");
+            PreparedStatement ps = DBUtil.getConnection().prepareStatement("select * from Contacts");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 int id = rs.getInt("id");
@@ -66,13 +75,13 @@ public class ContactsList {
         }
     }
 
-    /*
+    /**
      * 向数据库中添加行数据
      * @param Contacts con : 要传入需要写入数据库的联系人对象
      */
     public void updateTable(Contacts con) {
         try {
-            PreparedStatement ps = getConnection().prepareStatement("""
+            PreparedStatement ps = DBUtil.getConnection().prepareStatement("""
                         update Contacts set name = ?,tele1 = ?,tele2 = ?,home = ?,email = ?,notes = ?;
                     """);
             ps.setString(1, con.getName());
@@ -91,7 +100,7 @@ public class ContactsList {
      */
     public void PrintTable() {
         try {
-            PreparedStatement ps = getConnection().prepareStatement("""
+            PreparedStatement ps = DBUtil.getConnection().prepareStatement("""
                         select * from Contacts;
                     """);
             System.out.println("id" + "\t" + "name" + "\t" + "tele1" + "\t" + "tele2" + "\t" + "home" + "\t" + "email" + "\t" + "notes");
@@ -118,7 +127,7 @@ public class ContactsList {
      */
     public void printInfo() {
         try {
-            PreparedStatement ps = getConnection().prepareStatement("""
+            PreparedStatement ps = DBUtil.getConnection().prepareStatement("""
                         select * from Contacts;
                     """);
             System.out.println("name" + "\t" + "tele1" + "\t" + "notes");
@@ -134,16 +143,4 @@ public class ContactsList {
         }
     }
 
-    /*
-     * 获取连接的方法
-     * @return 数据库的连接
-     */
-    public Connection getConnection() {
-        try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:/Volumes/study/02-java/javaCurriculumDesign/contacts.sqlite");
-            return conn;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

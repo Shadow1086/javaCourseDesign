@@ -1,4 +1,4 @@
-package com.View;
+package com.cn.hbu.edu.htliang.view;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;

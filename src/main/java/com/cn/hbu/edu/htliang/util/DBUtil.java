@@ -1,4 +1,4 @@
-package com.Util;
+package com.cn.hbu.edu.htliang.util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,7 +12,7 @@ import java.sql.SQLException;
  * @author htLiang
  */
 public class DBUtil {
-    private static final String URL = "";
+    private static final String URL = "jdbc:sqlite:/Volumes/study/02-java/javaCurriculumDesign/contacts.sqlite";
     public static Connection getConnection() throws SQLException{
         return DriverManager.getConnection(URL);
     }
