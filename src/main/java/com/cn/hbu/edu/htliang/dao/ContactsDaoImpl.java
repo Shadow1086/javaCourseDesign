@@ -17,7 +17,7 @@ import java.util.List;
  * @author htLiang
  */
 public class ContactsDaoImpl implements ContactsDao {
-    /*
+    /**
      * 插入单个联系人方法
      */
     @Override
@@ -63,9 +63,8 @@ public class ContactsDaoImpl implements ContactsDao {
         }
     }
 
-    /*
+    /**
      * 插入多个联系人方法,可以应用在从文件导入中
-     *
      */
     @Override
     public void batchInsert(List<Contacts> contacts) {
@@ -91,7 +90,7 @@ public class ContactsDaoImpl implements ContactsDao {
         }
     }
 
-    /*
+    /**
      * 查询：通过ID查询
      */
     @Override
@@ -116,7 +115,7 @@ public class ContactsDaoImpl implements ContactsDao {
         return con;
     }
 
-    /*
+    /**
      * 查询：查询所有数据
      */
     public List<Contacts> findAll() {
@@ -182,7 +181,7 @@ public class ContactsDaoImpl implements ContactsDao {
         return list;
     }
 
-    /*
+    /**
      * 根据电话号码查询
      */
 
@@ -218,7 +217,7 @@ public class ContactsDaoImpl implements ContactsDao {
         return list;
     }
 
-    /*
+    /**
      * 更新数据
      */
     @Override
@@ -346,31 +345,5 @@ public class ContactsDaoImpl implements ContactsDao {
         }
         return false;
     }
-//    /**
-//     * 返回联系人ID
-//     *
-//     * @param con : 要查询ID的联系人对象
-//     * @return int result :返回的联系人ID
-//     */
-//    @Override
-//    public int returnId(Contacts con) {
-//        int result = 0;
-//        try {
-//            PreparedStatement ps = DBUtil.getConnection().prepareStatement("""
-//                        select * from Contacts where name = ?;
-//                    """);
-//            ps.setString(1, con.getName());
-//            ResultSet rs = ps.executeQuery();
-//            while (rs.next()) {
-//                result = rs.getInt("id");
-//            }
-//            rs.close();
-//            ps.close();
-//            DBUtil.getConnection().close();
-//            return result;
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
 
 }
