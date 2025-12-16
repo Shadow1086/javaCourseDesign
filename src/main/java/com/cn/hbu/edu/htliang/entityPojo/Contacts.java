@@ -24,7 +24,23 @@ public class Contacts {
     private List<Tags> tags;
 
     public Contacts(){}
-    
+
+    public List<Groups> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<Groups> groups) {
+        this.groups = groups;
+    }
+
+    public List<Tags> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tags> tags) {
+        this.tags = tags;
+    }
+
     public Contacts(String name, String tele1, String tele2, String home, String email, String notes) {
         this.name = name;
         this.tele1 = tele1;

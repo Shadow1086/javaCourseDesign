@@ -91,7 +91,7 @@ public class ContactServiceTest {
             List<Contacts> all = service.findAll();
             if (all != null && !all.isEmpty()) {
                 int testId = all.get(0).getId();
-                Contacts result = service.findId(testId);
+                Contacts result = service.findById(testId);
                 if (result != null) {
                     printPass("ID=" + testId + " 查询成功，姓名=" + result.getName());
                 } else {
@@ -102,7 +102,7 @@ public class ContactServiceTest {
             }
 
             // 测试不存在的ID
-            Contacts notExist = service.findId(-999);
+            Contacts notExist = service.findById(-999);
             if (notExist == null) {
                 printPass("不存在的ID查询正确返回null");
             }
@@ -117,7 +117,7 @@ public class ContactServiceTest {
     private static void testFindByName() {
         printTestHeader("测试根据姓名查询");
         try {
-            List<Contacts> result = service.findName("测试用户");
+            List<Contacts> result = service.findByName("测试用户");
             if (result != null) {
                 printPass("姓名查询成功，找到 " + result.size() + " 条记录");
             } else {
@@ -134,7 +134,7 @@ public class ContactServiceTest {
     private static void testFindByTele() {
         printTestHeader("测试根据电话查询");
         try {
-            List<Contacts> result = service.findTele("138");
+            List<Contacts> result = service.findByTele("138");
             if (result != null) {
                 printPass("电话查询成功，找到 " + result.size() + " 条记录");
             } else {
@@ -180,10 +180,10 @@ public class ContactServiceTest {
             List<Contacts> all = service.findAll();
             if (all != null && !all.isEmpty()) {
                 int deleteId = all.get(all.size() - 1).getId();
-                service.deleteId(deleteId);
+                service.deleteById(deleteId);
 
                 // 验证是否删除成功
-                Contacts deleted = service.findId(deleteId);
+                Contacts deleted = service.findById(deleteId);
                 if (deleted == null) {
                     printPass("ID=" + deleteId + " 删除成功");
                 } else {

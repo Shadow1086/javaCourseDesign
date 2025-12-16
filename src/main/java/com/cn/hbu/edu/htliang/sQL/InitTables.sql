@@ -1,3 +1,4 @@
+drop table if exists Contacts;
 -- 初始化多对多表之间的关联关系
 create table contacts
 (
@@ -37,3 +38,10 @@ create table tag_contacts
     tag_id      integer not null references tags (id) on update cascade on delete cascade,
     unique (contacts_id, tag_id)
 );
+-- 查看外键信息
+pragma foreign_key_list(contacts_group);
+pragma foreign_key_list(tag_contacts);
+-- SQLite 默认关闭外键约束，需手动开启
+pragma foreign_keys = on;
+pragma foreign_keys; -- 返回 1 表示已启用
+

@@ -17,9 +17,13 @@ public class Groups {
     private String group_notes;
     private List<Contacts> contactsGroupsList;
 
-    public Groups(String group_notes, String group_name) {
+    public Groups(int id, String group_name, String group_notes) {
+        this.id = id;
         this.group_notes = group_notes;
         this.group_name = group_name;
+    }
+
+    public Groups() {
     }
 
     public int getId() {

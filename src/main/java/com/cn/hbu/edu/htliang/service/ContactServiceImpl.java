@@ -2,8 +2,9 @@ package com.cn.hbu.edu.htliang.service;
 
 import com.cn.hbu.edu.htliang.dao.ContactsDaoImpl;
 import com.cn.hbu.edu.htliang.entityPojo.Contacts;
+import com.cn.hbu.edu.htliang.entityPojo.Groups;
+import com.cn.hbu.edu.htliang.entityPojo.Tags;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,7 +39,7 @@ public class ContactServiceImpl implements ContactService {
      * 根据ID查找联系人
      */
     @Override
-    public Contacts findId(int id) {
+    public Contacts findById(int id) {
         if (dao.exists(id)) {
             return dao.findById(id);
         } else {
@@ -56,7 +57,7 @@ public class ContactServiceImpl implements ContactService {
      * 根据姓名查找联系人
      */
     @Override
-    public List<Contacts> findName(String name) {
+    public List<Contacts> findByName(String name) {
         List<Contacts> result = dao.findByName(name);
         if (result == null) {
             System.out.println("无此用户");
@@ -69,14 +70,10 @@ public class ContactServiceImpl implements ContactService {
     /**
     * 通过手机号查询
     */
-    public List<Contacts> findTele(String tele){
+    public List<Contacts> findByTele(String tele) {
         if(tele.length()>11){
             //TODO : 应该添加一个电话号格式的正则表达式
-            try {
-                throw new Exception("输入电话有误");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            throw new IllegalArgumentException("输入电话有误");
         }
         return dao.findByTele(tele);
     }
@@ -86,7 +83,7 @@ public class ContactServiceImpl implements ContactService {
      * @param id : 要删除的联系人的ID
      */
     @Override
-    public void deleteId(int id) {
+    public void deleteById(int id) {
         if (dao.exists(id)) {
             dao.deleteById(id);
         } else {
@@ -113,5 +110,122 @@ public class ContactServiceImpl implements ContactService {
             e.printStackTrace();
         }
         return true;
+    }
+//分组操作
+
+    /**
+     * 创建新分组
+     */
+    public boolean addGroup(String name, String notes) {
+        if (name != null) {
+            dao.addGroup(name, notes);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 向分组中批量添加联系人，也可以单个添加
+     */
+    @Override
+    public boolean addContactInGroup(List<Contacts> list, Groups groups) {
+        if (list.isEmpty() || list == null) return false;
+        for (Contacts con : list) {
+            dao.addContactInGroup(con, groups);
+        }
+        return true;
+    }
+
+    /**
+     * 根据分组来删除分组
+     */
+    @Override
+    public boolean deleteGroup(String name) {
+        if (name != null) {
+            return dao.deleteGroup(name);
+        }
+        return false;
+    }
+
+    /**
+     * 查看某分组中包含的所有联系人
+     */
+    @Override
+    public List<Contacts> findByGroup(String name) {
+        if (name != null) {
+            return dao.findByGroup(name);
+        }
+        return null;
+    }
+
+    /**
+     * 查找所有分组
+     */
+    @Override
+    public List<Groups> findAllGroup() {
+        return dao.findAllGroup();
+    }
+
+//标签操作
+
+    /**
+     * 新建标签
+     */
+    @Override
+    public boolean addTag(String color, String name, String notes) {
+        if (color == null) {
+            return false;
+        } else {
+            dao.addTag(color, name, notes);
+            return true;
+        }
+    }
+
+    /**
+     * 根据标签颜色 删除标签
+     */
+    @Override
+    public boolean deleteTag(String color) {
+        if (color != null) {
+            return dao.deleteTag(color);
+        }
+        return false;
+    }
+
+    /**
+     * 向标签中添加联系人
+     */
+    public boolean addContactToTag(List<Contacts> list, Tags tag) {
+        if (list.isEmpty() || list == null) {
+            return false;
+        }
+        for (Contacts con : list) {
+            dao.addContactToTag(con, tag);
+        }
+        return true;
+    }
+
+    /**
+     * 查找标签中的所有联系人
+     */
+    @Override
+    public List<Contacts> findByTag(String color) {
+        if (color != null) {
+            return dao.findByTag(color);
+        }
+        return null;
+    }
+
+    /**
+     * 据联系人ID来查找其所在的组和标签
+     */
+    public Contacts findGroupTagsById(int id) {
+        if (!dao.exists(id)) return null;
+        List<Groups> groups = dao.findGroupsByContact(id);
+        List<Tags> tags = dao.findTagsByContact(id);
+        Contacts con = dao.findById(id);
+        con.setGroups(groups);
+        con.setTags(tags);
+        return con;
     }
 }

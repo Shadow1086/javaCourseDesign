@@ -13,13 +13,24 @@ import java.util.List;
  */
 public class Tags {
     private int id;
-    private String tags_name;
-    private String tags_color;
+    private String tag_name;
+    private String tag_color;
+    private String tag_notes;
+
+    public Tags(int id, String tag_name, String tag_color, String tag_notes) {
+        this.id = id;
+        this.tag_name = tag_name;
+        this.tag_color = tag_color;
+        this.tag_notes = tag_notes;
+    }
+
+    public Tags() {
+    }
+
     private List<Contacts> contactsTagsList;
 
-    public Tags(String tags_name, String tags_color) {
-        this.tags_name = tags_name;
-        this.tags_color = tags_color;
+    public String getTag_notes() {
+        return tag_notes;
     }
 
     public int getId() {
@@ -30,20 +41,24 @@ public class Tags {
         this.id = id;
     }
 
-    public String getTags_name() {
-        return tags_name;
+    public void setTag_notes(String tag_notes) {
+        this.tag_notes = tag_notes;
     }
 
-    public void setTags_name(String tags_name) {
-        this.tags_name = tags_name;
+    public String getTag_name() {
+        return tag_name;
     }
 
-    public String getTags_color() {
-        return tags_color;
+    public void setTag_name(String tag_name) {
+        this.tag_name = tag_name;
     }
 
-    public void setTags_color(String tags_color) {
-        this.tags_color = tags_color;
+    public String getTag_color() {
+        return tag_color;
+    }
+
+    public void setTag_color(String tag_color) {
+        this.tag_color = tag_color;
     }
 
     public List<Contacts> getContactsTagsList() {
