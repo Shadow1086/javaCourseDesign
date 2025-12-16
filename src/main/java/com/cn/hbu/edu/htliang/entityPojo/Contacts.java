@@ -1,4 +1,7 @@
 package com.cn.hbu.edu.htliang.entityPojo;
+
+import java.util.List;
+
 /**
  * ClassName: Contacts
  * Description: 
@@ -16,6 +19,9 @@ public class Contacts {
     private String home;
     private String email;
     private String notes;
+
+    private List<Groups> groups;
+    private List<Tags> tags;
 
     public Contacts(){}
     
