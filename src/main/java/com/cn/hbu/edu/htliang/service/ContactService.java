@@ -4,6 +4,7 @@ import com.cn.hbu.edu.htliang.entityPojo.Contacts;
 import com.cn.hbu.edu.htliang.entityPojo.Groups;
 import com.cn.hbu.edu.htliang.entityPojo.Tags;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -79,4 +80,14 @@ public interface ContactService {
 
     //根据联系人ID来查找其所在的组和标签
     Contacts findGroupTagsById(int id);
+
+    /**
+     * 从 vcf 文件导入联系人到数据库，返回成功导入的数量。
+     */
+    int importVcfFile(File file);
+
+    /**
+     * 将数据库中的联系人导出为 vcf 文件，返回写入后的文件对象（同入参）。
+     */
+    File exportVcfFile(File file);
 }

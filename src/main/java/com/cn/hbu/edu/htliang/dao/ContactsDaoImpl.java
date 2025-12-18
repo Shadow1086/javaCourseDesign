@@ -5,6 +5,7 @@ import com.cn.hbu.edu.htliang.entityPojo.Groups;
 import com.cn.hbu.edu.htliang.entityPojo.Tags;
 import com.cn.hbu.edu.htliang.util.DBUtil;
 
+import java.io.BufferedWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -896,6 +897,7 @@ public class ContactsDaoImpl implements ContactsDao {
 
     /**
      * 从rs中获取Contact对象，省略重复代码
+     *
      */
     private Contacts getContactsFromRsNext(ResultSet rs) {
         Contacts con = null;
@@ -908,4 +910,59 @@ public class ContactsDaoImpl implements ContactsDao {
         return con;
     }
 
+    /**
+     * 将数据库中的联系人导出到文件中
+     *
+     * @param bw : 从FileVcf中被调用
+     */
+    @Override
+    public List<String> writeVcfFileInService(BufferedWriter bw) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<String> resultList = new ArrayList<>();
+        try {
+            conn = DBUtil.getConnection();
+            ps = conn.prepareStatement("""
+                        select c.name,c.tele1,c.tele2,c.home,c.email,c.notes,g.group_name,t.tag_name
+                            from contacts c 
+                                join contacts_group cg  on c.id = cg.contacts_id 
+                                join groups g           on g.id = cg.group_id
+                                join tag_contacts tc    on c.id = tc.contacts_id
+                                join tags t             on t.id = tc.tag_id;
+                    """);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String line = rs.getString(1) + "," +
+                        rs.getString(2) + "," +
+                        rs.getString(3) + "," +
+                        rs.getString(4) + "," +
+                        rs.getString(5) + "," +
+                        rs.getString(6) + "," +
+                        rs.getString(7) + "," +
+                        rs.getString(8);
+                resultList.add(line);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (ps != null) ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return resultList;
+    }
 }

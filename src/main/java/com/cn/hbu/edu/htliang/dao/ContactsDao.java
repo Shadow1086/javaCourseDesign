@@ -4,6 +4,7 @@ import com.cn.hbu.edu.htliang.entityPojo.Contacts;
 import com.cn.hbu.edu.htliang.entityPojo.Groups;
 import com.cn.hbu.edu.htliang.entityPojo.Tags;
 
+import java.io.BufferedWriter;
 import java.util.List;
 
 /**
@@ -73,4 +74,7 @@ public interface ContactsDao {
     List<Groups> findGroupsByContact(int id);
 
     List<Tags> findTagsByContact(int id);
+
+    // 将数据库中的所有联系人信息按行字符串的格式储存在list<String>中，便于导出联系人
+    List<String> writeVcfFileInService(BufferedWriter bw);
 }
