@@ -12,7 +12,7 @@ import java.sql.SQLException;
  * @author htLiang
  */
 public class DBUtil {
-    private static final String URL = "jdbc:sqlite:/Volumes/study/02-java/javaCurriculumDesign/contacts.sqlite";
+    private static final String URL = "jdbc:sqlite:contacts.sqlite";
     public static Connection getConnection() throws SQLException{
         return DriverManager.getConnection(URL);
     }

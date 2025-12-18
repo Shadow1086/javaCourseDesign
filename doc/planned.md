@@ -244,6 +244,45 @@ SELECT * FROM contacts ORDER BY name COLLATE NOCASE ASC;
 
 ---
 
+
+BEGIN:VCARD
+VERSION:3.0
+N:姓;名;中间名;前缀;后缀
+FN:显示的全名
+TEL;TYPE=CELL:手机号码
+EMAIL:邮箱地址
+END:VCARD
+┌─────────────┬────────────────────────────────────────────┐
+│ 属性名 │ 说明 │
+├─────────────┼────────────────────────────────────────────┤
+│ VERSION │ 版本号（必需）：2.1 / 3.0 / 4.0 │
+│ N │ 姓名结构：姓;名;中间名;前缀;后缀 │
+│ FN │ 格式化全名（必需） │
+│ TEL │ 电话（可加TYPE=CELL/WORK/HOME） │
+│ EMAIL │ 电子邮件 │
+│ ADR │ 地址：邮箱;扩展;街道;城市;省份;邮编;国家 │
+│ ORG │ 组织/公司名称 │
+│ TITLE │ 职位/头衔 │
+│ BDAY │ 生日（格式：YYYY-MM-DD） │
+│ NOTE │ 备注信息 │
+│ URL │ 网址 │
+│ PHOTO │ 照片（Base64编码） │
+└─────────────┴────────────────────────────────────────────┘
+
+BEGIN:VCARD
+VERSION:3.0
+N:张;三;;;
+FN:张三
+TEL;TYPE=CELL:13800138000
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+N:李;四;;;
+FN:李四
+TEL;TYPE=CELL:13900139000
+END:VCARD
+
 ## 📝 开发日志
 
 ### 2025-12-09
