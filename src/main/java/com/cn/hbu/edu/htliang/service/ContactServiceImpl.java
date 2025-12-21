@@ -4,10 +4,14 @@ import com.cn.hbu.edu.htliang.dao.ContactsDaoImpl;
 import com.cn.hbu.edu.htliang.entityPojo.Contacts;
 import com.cn.hbu.edu.htliang.entityPojo.Groups;
 import com.cn.hbu.edu.htliang.entityPojo.Tags;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 类名: ContactsService
@@ -19,7 +23,7 @@ import java.util.List;
  */
 public class ContactServiceImpl implements ContactService {
     private final ContactsDaoImpl dao = new ContactsDaoImpl();
-
+    private static final Logger logger = LoggerFactory.getLogger(ContactServiceImpl.class);
     /**
      * 添加单个联系人
      * 姓名等所有信息都需要添加到形参，除了ID
@@ -27,14 +31,16 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public void addContact(String name, String tele1, String tele2, String home, String email, String notes) {
         if (name == null) {
-            System.err.println("姓名不能为空");
-        } else if (tele1 == null) {
-            System.err.println("电话不能为空");
-        } else {
-            Contacts con = new Contacts(name, tele1, tele2, home, email, notes);
-            dao.insert(con);
-            System.out.println(con); //TODO:以后可以删除，只是验证ID返回是否正确
+            logger.warn("添加联系人失败：姓名不能为空");
+            return;
         }
+        if (tele1 == null) {
+            logger.warn("添加联系人失败：电话不能为空");
+            return;
+        }
+        Contacts con = new Contacts(name, tele1, tele2, home, email, notes);
+        dao.insert(con);
+        logger.debug("添加联系人成功: {}", con);
     }
 
     /**
@@ -44,16 +50,17 @@ public class ContactServiceImpl implements ContactService {
     public Contacts findById(int id) {
         if (dao.exists(id)) {
             return dao.findById(id);
-        } else {
-            System.err.println("没有ID为：" + id + "的用户");
         }
+        logger.warn("未找到ID为{}的联系人", id);
         return null;
     }
     /**
     * 查询所有联系人
     */
     public List<Contacts> findAll(){
-        return dao.findAll();
+        List<Contacts> result = dao.findAll();
+        logger.debug("查询到{}条联系人", result.size());
+        return result;
     }
     /**
      * 根据姓名查找联系人
@@ -61,21 +68,19 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public List<Contacts> findByName(String name) {
         List<Contacts> result = dao.findByName(name);
-        if (result == null) {
-            System.out.println("无此用户");
+        if (result == null || result.isEmpty()) {
+            logger.warn("未找到姓名为{}的联系人", name);
             return null;
         }
         return result;
-
     }
 
     /**
     * 通过手机号查询
     */
     public List<Contacts> findByTele(String tele) {
-        if(tele.length()>11){
-            //TODO : 应该添加一个电话号格式的正则表达式
-            throw new IllegalArgumentException("输入电话有误");
+        if (tele == null || tele.length() != 11 || !teleIsMactches(tele)) {
+            logger.warn("电话号码格式有误: {}", tele);
         }
         return dao.findByTele(tele);
     }
@@ -88,8 +93,9 @@ public class ContactServiceImpl implements ContactService {
     public void deleteById(int id) {
         if (dao.exists(id)) {
             dao.deleteById(id);
+            logger.debug("删除联系人成功, id={}", id);
         } else {
-            System.err.println("没有ID为：" + id + "的用户");
+            logger.warn("删除失败，未找到ID为{}的联系人", id);
         }
     }
 
@@ -98,7 +104,10 @@ public class ContactServiceImpl implements ContactService {
      */
     @Override
     public boolean updateContactInfo(int id, String newName, String newTele1, String newTele2, String newHome, String newEmail, String newNotes) {
-        if (!dao.exists(id)) return false;
+        if (!dao.exists(id)) {
+            logger.warn("修改失败，未找到ID为{}的联系人", id);
+            return false;
+        }
         try {
             Contacts con = dao.findById(id);
             if (newName == null) newName = con.getName();
@@ -108,22 +117,27 @@ public class ContactServiceImpl implements ContactService {
             if (newEmail == null) newEmail = con.getEmail();
             if (newNotes == null) newNotes = con.getNotes();
             dao.updateInfo(id, newName, newTele1, newTele2, newHome, newEmail, newNotes);
+            logger.debug("修改联系人成功, id={}", id);
+            return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("修改联系人信息失败, id={}", id, e);
+            return false;
         }
-        return true;
     }
+
 //分组操作
 
     /**
      * 创建新分组
      */
     public boolean addGroup(String name, String notes) {
-        if (name != null) {
-            dao.addGroup(name, notes);
-            return true;
+        if (name == null || name.isEmpty()) {
+            logger.warn("创建分组失败：名称不能为空");
+            return false;
         }
-        return false;
+        dao.addGroup(name, notes);
+        logger.debug("创建分组成功: {}", name);
+        return true;
     }
 
     /**
@@ -131,10 +145,14 @@ public class ContactServiceImpl implements ContactService {
      */
     @Override
     public boolean addContactInGroup(List<Contacts> list, Groups groups) {
-        if (list.isEmpty() || list == null) return false;
+        if (list == null || list.isEmpty()) {
+            logger.warn("添加联系人到分组失败：列表为空");
+            return false;
+        }
         for (Contacts con : list) {
             dao.addContactInGroup(con, groups);
         }
+        logger.debug("批量添加{}个联系人到分组", list.size());
         return true;
     }
 
@@ -143,10 +161,11 @@ public class ContactServiceImpl implements ContactService {
      */
     @Override
     public boolean deleteGroup(String name) {
-        if (name != null) {
-            return dao.deleteGroup(name);
+        if (name == null || name.isEmpty()) {
+            logger.warn("删除分组失败：组名为空");
+            return false;
         }
-        return false;
+        return dao.deleteGroup(name);
     }
 
     /**
@@ -154,10 +173,11 @@ public class ContactServiceImpl implements ContactService {
      */
     @Override
     public List<Contacts> findByGroup(String name) {
-        if (name != null) {
-            return dao.findByGroup(name);
+        if (name == null || name.isEmpty()) {
+            logger.warn("查询分组联系人失败：组名为空");
+            return null;
         }
-        return null;
+        return dao.findByGroup(name);
     }
 
     /**
@@ -175,12 +195,13 @@ public class ContactServiceImpl implements ContactService {
      */
     @Override
     public boolean addTag(String color, String name, String notes) {
-        if (color == null) {
+        if (color == null || color.isEmpty()) {
+            logger.warn("新建标签失败：颜色不能为空");
             return false;
-        } else {
-            dao.addTag(color, name, notes);
-            return true;
         }
+        dao.addTag(color, name, notes);
+        logger.debug("新建标签成功: color={}, name={}", color, name);
+        return true;
     }
 
     /**
@@ -188,22 +209,25 @@ public class ContactServiceImpl implements ContactService {
      */
     @Override
     public boolean deleteTag(String color) {
-        if (color != null) {
-            return dao.deleteTag(color);
+        if (color == null || color.isEmpty()) {
+            logger.warn("删除标签失败：颜色为空");
+            return false;
         }
-        return false;
+        return dao.deleteTag(color);
     }
 
     /**
      * 向标签中添加联系人
      */
     public boolean addContactToTag(List<Contacts> list, Tags tag) {
-        if (list.isEmpty() || list == null) {
+        if (list == null || list.isEmpty()) {
+            logger.warn("添加联系人到标签失败：列表为空");
             return false;
         }
         for (Contacts con : list) {
             dao.addContactToTag(con, tag);
         }
+        logger.debug("批量添加{}个联系人到标签", list.size());
         return true;
     }
 
@@ -212,17 +236,21 @@ public class ContactServiceImpl implements ContactService {
      */
     @Override
     public List<Contacts> findByTag(String color) {
-        if (color != null) {
-            return dao.findByTag(color);
+        if (color == null || color.isEmpty()) {
+            logger.warn("查询标签联系人失败：颜色为空");
+            return null;
         }
-        return null;
+        return dao.findByTag(color);
     }
 
     /**
      * 据联系人ID来查找其所在的组和标签
      */
     public Contacts findGroupTagsById(int id) {
-        if (!dao.exists(id)) return null;
+        if (!dao.exists(id)) {
+            logger.warn("未找到ID为{}的联系人", id);
+            return null;
+        }
         List<Groups> groups = dao.findGroupsByContact(id);
         List<Tags> tags = dao.findTagsByContact(id);
         Contacts con = dao.findById(id);
@@ -275,12 +303,12 @@ public class ContactServiceImpl implements ContactService {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("读取VCF文件失败: {}", file.getName(), e);
         } finally {
             try {
                 if (br != null) br.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("关闭文件流失败", e);
             }
         }
         return list;
@@ -307,7 +335,7 @@ public class ContactServiceImpl implements ContactService {
                 } else if (con.getTele2() == null || con.getTele2().isBlank()) {
                     if (!con.getTele1().equals(value)) con.setTele2(value);
                 } else {
-                    System.out.println("出错了，多余的电话号保存在了note备注中");
+                    logger.debug("多余的电话号保存在备注中: {}", value);
                     if (con.getNotes() != null) {
                         con.setNotes(con.getNotes() + "\n备注电话号：" + value);
                     } else {
@@ -378,13 +406,16 @@ public class ContactServiceImpl implements ContactService {
 
                 bw.write("\nEND:VCARD");
             }
-
+            logger.debug("导出联系人文件成功: {}", file.getName());
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("导出联系人文件失败: {}", file.getName(), e);
         }
         return file;
     }
 
+    /**
+     * 导入联系人列表
+     */
     @Override
     public int importVcfFile(File file) {
         List<Contacts> contacts = readVcfFile(file);
@@ -400,13 +431,25 @@ public class ContactServiceImpl implements ContactService {
             if (!hasValue(c.getName()) || !hasValue(c.getTele1())) continue;
             readyToInsert.add(c);
         }
-        if (readyToInsert.isEmpty()) return 0;
+        if (readyToInsert.isEmpty()) {
+            return 0;
+        }
         dao.batchInsert(readyToInsert);
+        logger.debug("从文件导入{}条联系人", readyToInsert.size());
         return readyToInsert.size();
     }
 
     @Override
     public File exportVcfFile(File file) {
         return writeVcfFile(file);
+    }
+
+    /**
+     * 检查电话号的正则表达式
+     */
+    private boolean teleIsMactches(String tele) {
+        Pattern pattern = Pattern.compile("1\\d{10}");
+        Matcher matcher = pattern.matcher(tele);
+        return matcher.matches();
     }
 }

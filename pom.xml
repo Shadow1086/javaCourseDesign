@@ -29,13 +29,18 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.45.0.0</version>
         </dependency>
-
+        <!--日志依赖-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.36</version>
         </dependency>
-
+        <!-- 日志DLF4J的具体实现依赖       -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.5.21</version>
+        </dependency>
         <!-- JUnit for testing -->
         <!-- scope 设置为 compile，因为源码目录中也在使用 JUnit -->
         <dependency>
