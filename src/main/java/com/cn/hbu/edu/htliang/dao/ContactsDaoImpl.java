@@ -3,7 +3,7 @@ package com.cn.hbu.edu.htliang.dao;
 import com.cn.hbu.edu.htliang.entityPojo.Contacts;
 import com.cn.hbu.edu.htliang.entityPojo.Groups;
 import com.cn.hbu.edu.htliang.entityPojo.Tags;
-import com.cn.hbu.edu.htliang.util.DBUtil;
+import com.cn.hbu.edu.htliang.util.DatabaseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +28,7 @@ public class ContactsDaoImpl implements ContactsDao {
     @Override
     public void insert(Contacts con) {
         String sql = "INSERT INTO contacts (name, tele1, tele2, home, email, notes) VALUES (?,?,?,?,?,?)";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, con.getName());
             ps.setString(2, con.getTele1());
@@ -53,7 +53,7 @@ public class ContactsDaoImpl implements ContactsDao {
     @Override
     public void batchInsert(List<Contacts> contacts) {
         String sql = "INSERT INTO contacts (name, tele1, tele2, home, email, notes) VALUES (?,?,?,?,?,?)";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             for (Contacts con : contacts) {
                 ps.setString(1, con.getName());
@@ -77,7 +77,7 @@ public class ContactsDaoImpl implements ContactsDao {
     @Override
     public Contacts findById(int id) {
         String sql = "SELECT * FROM contacts WHERE id = ?";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -98,7 +98,7 @@ public class ContactsDaoImpl implements ContactsDao {
     public List<Contacts> findAll() {
         List<Contacts> list = new ArrayList<>();
         String sql = "SELECT * FROM contacts";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -119,7 +119,7 @@ public class ContactsDaoImpl implements ContactsDao {
     public List<Contacts> findByName(String name) {
         List<Contacts> list = new ArrayList<>();
         String sql = "SELECT * FROM contacts WHERE name LIKE ?";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "%" + name + "%");
             try (ResultSet rs = ps.executeQuery()) {
@@ -140,7 +140,7 @@ public class ContactsDaoImpl implements ContactsDao {
     public List<Contacts> findByTele(String tele) {
         List<Contacts> list = new ArrayList<>();
         String sql = "SELECT * FROM contacts WHERE tele1 = ? OR tele2 = ?";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, tele);
             ps.setString(2, tele);
@@ -161,7 +161,7 @@ public class ContactsDaoImpl implements ContactsDao {
     @Override
     public void update(Contacts con) {
         String sql = "UPDATE contacts SET name=?, tele1=?, tele2=?, home=?, email=?, notes=? WHERE id=?";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, con.getName());
             ps.setString(2, con.getTele1());
@@ -182,7 +182,7 @@ public class ContactsDaoImpl implements ContactsDao {
     @Override
     public void updateInfo(int id, String newName, String newTele1, String newTele2, String newHome, String newEmail, String newNotes) {
         String sql = "UPDATE contacts SET name=?, tele1=?, tele2=?, home=?, email=?, notes=? WHERE id=?";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, newName);
             ps.setString(2, newTele1);
@@ -203,7 +203,7 @@ public class ContactsDaoImpl implements ContactsDao {
     @Override
     public void deleteById(int id) {
         String sql = "DELETE FROM contacts WHERE id = ?";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
@@ -218,7 +218,7 @@ public class ContactsDaoImpl implements ContactsDao {
     @Override
     public boolean exists(int id) {
         String sql = "SELECT 1 FROM contacts WHERE id = ?";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -236,7 +236,7 @@ public class ContactsDaoImpl implements ContactsDao {
     @Override
     public boolean addGroup(String name, String notes) {
         String sql = "INSERT INTO groups (group_name, group_notes) VALUES (?,?)";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
             ps.setString(2, notes);
@@ -254,7 +254,7 @@ public class ContactsDaoImpl implements ContactsDao {
     @Override
     public boolean addContactInGroup(Contacts con, Groups group) {
         String sql = "INSERT INTO contacts_group (contacts_id, group_id) VALUES (?,?)";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, con.getId());
             ps.setInt(2, group.getId());
@@ -272,7 +272,7 @@ public class ContactsDaoImpl implements ContactsDao {
     @Override
     public boolean deleteGroup(String name) {
         String sql = "DELETE FROM groups WHERE group_name = ?";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
             ps.executeUpdate();
@@ -296,7 +296,7 @@ public class ContactsDaoImpl implements ContactsDao {
                 JOIN groups g ON g.id = cg.group_id
                 WHERE g.group_name = ?
                 """;
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
             try (ResultSet rs = ps.executeQuery()) {
@@ -317,7 +317,7 @@ public class ContactsDaoImpl implements ContactsDao {
     public List<Groups> findAllGroup() {
         List<Groups> list = new ArrayList<>();
         String sql = "SELECT * FROM groups";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -338,7 +338,7 @@ public class ContactsDaoImpl implements ContactsDao {
     @Override
     public boolean addTag(String color, String name, String notes) {
         String sql = "INSERT INTO tags (tag_color, tag_name, tag_notes) VALUES (?,?,?)";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, color);
             ps.setString(2, name);
@@ -357,7 +357,7 @@ public class ContactsDaoImpl implements ContactsDao {
     @Override
     public boolean deleteTag(String color) {
         String sql = "DELETE FROM tags WHERE tag_color = ?";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, color);
             ps.executeUpdate();
@@ -374,7 +374,7 @@ public class ContactsDaoImpl implements ContactsDao {
     @Override
     public boolean addContactToTag(Contacts con, Tags tag) {
         String sql = "INSERT INTO tag_contacts (contacts_id, tag_id) VALUES (?,?)";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, con.getId());
             ps.setInt(2, tag.getId());
@@ -399,7 +399,7 @@ public class ContactsDaoImpl implements ContactsDao {
                 JOIN tags t ON t.id = tc.tag_id
                 WHERE t.tag_color = ?
                 """;
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, color);
             try (ResultSet rs = ps.executeQuery()) {
@@ -420,7 +420,7 @@ public class ContactsDaoImpl implements ContactsDao {
     public List<Tags> findAllTags() {
         List<Tags> list = new ArrayList<>();
         String sql = "SELECT * FROM tags";
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -445,7 +445,7 @@ public class ContactsDaoImpl implements ContactsDao {
                 JOIN contacts_group cg ON g.id = cg.group_id
                 WHERE cg.contacts_id = ?
                 """;
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -472,7 +472,7 @@ public class ContactsDaoImpl implements ContactsDao {
                 JOIN tag_contacts tc ON t.id = tc.tag_id
                 WHERE tc.contacts_id = ?
                 """;
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -518,7 +518,7 @@ public class ContactsDaoImpl implements ContactsDao {
                 JOIN tag_contacts tc ON c.id = tc.contacts_id
                 JOIN tags t ON t.id = tc.tag_id
                 """;
-        try (Connection conn = DBUtil.getConnection();
+        try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
