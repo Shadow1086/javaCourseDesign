@@ -11,7 +11,7 @@
     <!-- 文件输出 -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!--        logs/app.log : 日志文件保存路径     -->
-        <file>logs/app.log</file>
+        <file>appLogs/app.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>logs/app.%d{yyyy-MM-dd}.log</fileNamePattern>
             <!--            日志保留的时间         -->

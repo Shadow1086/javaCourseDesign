@@ -4,12 +4,11 @@ import com.cn.hbu.edu.htliang.entityPojo.Contacts;
 import com.cn.hbu.edu.htliang.entityPojo.Groups;
 import com.cn.hbu.edu.htliang.entityPojo.Tags;
 import com.cn.hbu.edu.htliang.util.DBUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,50 +20,30 @@ import java.util.List;
  * @author htLiang
  */
 public class ContactsDaoImpl implements ContactsDao {
+    private static final Logger logger = LoggerFactory.getLogger(ContactsDaoImpl.class);
+
     /**
      * 插入单个联系人方法
      */
     @Override
     public void insert(Contacts con) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        Connection conn = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        insert into contacts (name, tele1, tele2, home, email, notes) VALUES (?,?,?,?,?,?);
-                    """);
+        String sql = "INSERT INTO contacts (name, tele1, tele2, home, email, notes) VALUES (?,?,?,?,?,?)";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, con.getName());
             ps.setString(2, con.getTele1());
             ps.setString(3, con.getTele2());
             ps.setString(4, con.getHome());
             ps.setString(5, con.getEmail());
             ps.setString(6, con.getNotes());
-            ps.execute();
-            rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                int generatedId = rs.getInt(1);
-                con.setId(generatedId);
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    con.setId(rs.getInt(1));
+                }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println("ContactsDaoImpl类下的insert方法出现问题");
-        } finally {
-            try{
-                if (rs != null) rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("插入联系人失败: {}", con.getName(), e);
         }
     }
 
@@ -73,14 +52,9 @@ public class ContactsDaoImpl implements ContactsDao {
      */
     @Override
     public void batchInsert(List<Contacts> contacts) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        insert into contacts (name, tele1, tele2, home, email, notes) values (?,?,?,?,?,?);
-                    """);
+        String sql = "INSERT INTO contacts (name, tele1, tele2, home, email, notes) VALUES (?,?,?,?,?,?)";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             for (Contacts con : contacts) {
                 ps.setString(1, con.getName());
                 ps.setString(2, con.getTele1());
@@ -90,21 +64,10 @@ public class ContactsDaoImpl implements ContactsDao {
                 ps.setString(6, con.getNotes());
                 ps.addBatch();
             }
-            ps.executeBatch();//使用批处理，一次性执行所有
-            System.err.println("batchInsert方法成功");
+            ps.executeBatch();
+            logger.debug("批量插入{}条联系人成功", contacts.size());
         } catch (SQLException e) {
-            System.err.println("ContactsDaoImpl 类下的 batchInsert方法出错");
-        } finally {
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("批量插入联系人失败", e);
         }
     }
 
@@ -113,123 +76,59 @@ public class ContactsDaoImpl implements ContactsDao {
      */
     @Override
     public Contacts findById(int id) {
-        Contacts con = null;
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        select * from contacts where id = ?;
-                    """);
+        String sql = "SELECT * FROM contacts WHERE id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                con = getContactsFromRsNext(rs);
-                break;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return getContactsFromRsNext(rs);
+                }
             }
         } catch (SQLException e) {
-            System.err.println("contactsDaoImpl类下的findById出错");
-        } finally {
-            try {
-                if (rs != null) rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("查询联系人失败, id={}", id, e);
         }
-        return con;
+        return null;
     }
 
     /**
      * 查询：查询所有数据
      */
+    @Override
     public List<Contacts> findAll() {
-        List<Contacts> list = new ArrayList<Contacts>();
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        select * from contacts;
-                    """);
-            rs = ps.executeQuery();
+        List<Contacts> list = new ArrayList<>();
+        String sql = "SELECT * FROM contacts";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                Contacts con = getContactsFromRsNext(rs);
-                list.add(con);
+                list.add(getContactsFromRsNext(rs));
             }
         } catch (SQLException e) {
-            System.err.println("findAll方法有误");
-        } finally {
-            try {
-                if (rs != null) rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("查询所有联系人失败", e);
         }
         return list;
     }
 
-
     /**
-     * 根据姓名查询,需要在serveice中去调用这个方法，使用返回的列表展示在GUI上
+     * 根据姓名查询,需要在service中去调用这个方法，使用返回的列表展示在GUI上
      *
      * @return List<Contacts> 以姓名查询的联系人列表
      */
+    @Override
     public List<Contacts> findByName(String name) {
-        List<Contacts> list = new ArrayList<Contacts>();
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        select * from contacts where name like ?;
-                    """);
+        List<Contacts> list = new ArrayList<>();
+        String sql = "SELECT * FROM contacts WHERE name LIKE ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "%" + name + "%");
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                Contacts con = getContactsFromRsNext(rs);
-                list.add(con);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(getContactsFromRsNext(rs));
+                }
             }
         } catch (SQLException e) {
-            System.err.println("findByName方法有误");
-        } finally {
-            try {
-                if (rs != null) rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("按姓名查询联系人失败, name={}", name, e);
         }
         return list;
     }
@@ -237,43 +136,21 @@ public class ContactsDaoImpl implements ContactsDao {
     /**
      * 根据电话号码查询
      */
-
     @Override
     public List<Contacts> findByTele(String tele) {
-        List<Contacts> list = new ArrayList<Contacts>();
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        select * from contacts where tele1 = ? OR tele2 = ?;
-                    """);
+        List<Contacts> list = new ArrayList<>();
+        String sql = "SELECT * FROM contacts WHERE tele1 = ? OR tele2 = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, tele);
             ps.setString(2, tele);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                Contacts con = getContactsFromRsNext(rs);
-                list.add(con);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(getContactsFromRsNext(rs));
+                }
             }
         } catch (SQLException e) {
-            System.err.println("findByTele方法有误");
-        } finally {
-            try {
-                if (rs != null) rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("按电话查询联系人失败, tele={}", tele, e);
         }
         return list;
     }
@@ -283,14 +160,9 @@ public class ContactsDaoImpl implements ContactsDao {
      */
     @Override
     public void update(Contacts con) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        update contacts set name = ?,tele1 = ? ,tele2 = ?,home = ? ,email = ?,notes = ?
-                        where id = ?;
-                    """);
+        String sql = "UPDATE contacts SET name=?, tele1=?, tele2=?, home=?, email=?, notes=? WHERE id=?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, con.getName());
             ps.setString(2, con.getTele1());
             ps.setString(3, con.getTele2());
@@ -300,35 +172,18 @@ public class ContactsDaoImpl implements ContactsDao {
             ps.setInt(7, con.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("update方法有误");
-        } finally {
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("更新联系人失败, id={}", con.getId(), e);
         }
     }
 
     /**
-     * 根据电话号更新数据
+     * 根据ID更新数据
      */
-
     @Override
     public void updateInfo(int id, String newName, String newTele1, String newTele2, String newHome, String newEmail, String newNotes) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        update contacts set name=?,tele1=?,tele2=?,home=?,email=?,notes=?
-                        where id  = ?;
-                    """);
+        String sql = "UPDATE contacts SET name=?, tele1=?, tele2=?, home=?, email=?, notes=? WHERE id=?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, newName);
             ps.setString(2, newTele1);
             ps.setString(3, newTele2);
@@ -338,156 +193,75 @@ public class ContactsDaoImpl implements ContactsDao {
             ps.setInt(7, id);
             ps.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("更新联系人信息失败, id={}", id, e);
         }
     }
 
     /**
      * 根据ID删除联系人
      */
-
     @Override
     public void deleteById(int id) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        delete from contacts where id = ?;
-                    """);
+        String sql = "DELETE FROM contacts WHERE id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
-
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println("根据ID删除联系人失败");
-        } finally {
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("删除联系人失败, id={}", id, e);
         }
     }
 
     /**
      * 判断联系人是否存在
      */
-
     @Override
     public boolean exists(int id) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        select * from contacts where id = ?;
-                    """);
+        String sql = "SELECT 1 FROM contacts WHERE id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
-            rs = ps.executeQuery();
-            return rs.next();
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("检查联系人是否存在失败, id={}", id, e);
         }
         return false;
     }
 
     /**
-     * 新建分组,并向表中添加联系人,这里只添加一个，会另写方法单独添加联系人
+     * 新建分组
      */
     @Override
     public boolean addGroup(String name, String notes) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        -- 先创建一个分组行
-                        insert into groups (group_name, group_notes) VALUES (?,?); 
-                    """);
+        String sql = "INSERT INTO groups (group_name, group_notes) VALUES (?,?)";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
             ps.setString(2, notes);
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("创建分组失败, name={}", name, e);
         }
         return false;
     }
 
     /**
-     * 添加联系人
+     * 向分组中添加联系人
      */
     @Override
     public boolean addContactInGroup(Contacts con, Groups group) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        insert into contacts_group(contacts_id,group_id) values (?,?);
-                    """);
+        String sql = "INSERT INTO contacts_group (contacts_id, group_id) VALUES (?,?)";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, con.getId());
             ps.setInt(2, group.getId());
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("添加联系人到分组失败, contactId={}, groupId={}", con.getId(), group.getId(), e);
         }
         return false;
     }
@@ -497,29 +271,14 @@ public class ContactsDaoImpl implements ContactsDao {
      */
     @Override
     public boolean deleteGroup(String name) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        delete from groups where group_name = ?;
-                    """);
+        String sql = "DELETE FROM groups WHERE group_name = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("删除分组失败, name={}", name, e);
         }
         return false;
     }
@@ -529,45 +288,24 @@ public class ContactsDaoImpl implements ContactsDao {
      */
     @Override
     public List<Contacts> findByGroup(String name) {
-        List<Contacts> list = null;
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        select c.id,c.name,c.tele1,c.tele2,g.group_name,c.notes,c.home,c.email
-                            from contacts c join contacts_group cg 
-                        on c.id = cg.contacts_id
-                        join groups g 
-                        on g.id = cg.group_id
-                        where g.group_name = ?;
-                    """);
+        List<Contacts> list = new ArrayList<>();
+        String sql = """
+                SELECT c.id, c.name, c.tele1, c.tele2, c.home, c.email, c.notes
+                FROM contacts c
+                JOIN contacts_group cg ON c.id = cg.contacts_id
+                JOIN groups g ON g.id = cg.group_id
+                WHERE g.group_name = ?
+                """;
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
-            rs = ps.executeQuery();
-            list = new ArrayList<>();
-            while (rs.next()) {
-                Contacts con = getContactsFromRsNext(rs);
-                list.add(con);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(getContactsFromRsNext(rs));
+                }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("查询分组联系人失败, groupName={}", name, e);
         }
         return list;
     }
@@ -575,40 +313,19 @@ public class ContactsDaoImpl implements ContactsDao {
     /**
      * 显示所有分组
      */
+    @Override
     public List<Groups> findAllGroup() {
-        List<Groups> list = null;
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                    select  * from groups;   
-                    """);
-            rs = ps.executeQuery();
-            list = new ArrayList<>();
+        List<Groups> list = new ArrayList<>();
+        String sql = "SELECT * FROM groups";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Groups group = new Groups(rs.getInt("id"), rs.getString("group_name"), rs.getString("group_notes"));
                 list.add(group);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("查询所有分组失败", e);
         }
         return list;
     }
@@ -620,31 +337,16 @@ public class ContactsDaoImpl implements ContactsDao {
      */
     @Override
     public boolean addTag(String color, String name, String notes) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        insert into tags(tag_color, tag_name, tag_notes) VALUES (?,?,?);
-                    """);
+        String sql = "INSERT INTO tags (tag_color, tag_name, tag_notes) VALUES (?,?,?)";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, color);
             ps.setString(2, name);
             ps.setString(3, notes);
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("创建标签失败, color={}", color, e);
         }
         return false;
     }
@@ -654,29 +356,14 @@ public class ContactsDaoImpl implements ContactsDao {
      */
     @Override
     public boolean deleteTag(String color) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        delete from tags where tag_color = ?;
-                    """);
+        String sql = "DELETE FROM tags WHERE tag_color = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, color);
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("删除标签失败, color={}", color, e);
         }
         return false;
     }
@@ -686,30 +373,15 @@ public class ContactsDaoImpl implements ContactsDao {
      */
     @Override
     public boolean addContactToTag(Contacts con, Tags tag) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        insert into tag_contacts(contacts_id, tag_id) values (?,?);
-                    """);
+        String sql = "INSERT INTO tag_contacts (contacts_id, tag_id) VALUES (?,?)";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, con.getId());
             ps.setInt(2, tag.getId());
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("添加联系人到标签失败, contactId={}, tagId={}", con.getId(), tag.getId(), e);
         }
         return false;
     }
@@ -717,45 +389,26 @@ public class ContactsDaoImpl implements ContactsDao {
     /**
      * 查找标签中所有联系人
      */
+    @Override
     public List<Contacts> findByTag(String color) {
-        List<Contacts> list = null;
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        select c.id,c.name,c.tele1,c.tele2,t.tag_color,c.notes,c.home,c.email
-                            from contacts c join tag_contacts tg
-                        on c.id = tg.contacts_id
-                        join tags t
-                        on t.id = tg.tag_id
-                        where t.tag_color = ?;
-                    """);
+        List<Contacts> list = new ArrayList<>();
+        String sql = """
+                SELECT c.id, c.name, c.tele1, c.tele2, c.home, c.email, c.notes
+                FROM contacts c
+                JOIN tag_contacts tc ON c.id = tc.contacts_id
+                JOIN tags t ON t.id = tc.tag_id
+                WHERE t.tag_color = ?
+                """;
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, color);
-            rs = ps.executeQuery();
-            list = new ArrayList<Contacts>();
-            while (rs.next()) {
-                list.add(getContactsFromRsNext(rs));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(getContactsFromRsNext(rs));
+                }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("查询标签联系人失败, color={}", color, e);
         }
         return list;
     }
@@ -765,149 +418,88 @@ public class ContactsDaoImpl implements ContactsDao {
      */
     @Override
     public List<Tags> findAllTags() {
-        List<Tags> list = null;
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        select * from tags;
-                    """);
-            rs = ps.executeQuery();
-            list = new ArrayList<>();
+        List<Tags> list = new ArrayList<>();
+        String sql = "SELECT * FROM tags";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                Tags tags = new Tags(rs.getInt("id"), rs.getString("tag_name"), rs.getString("tag_color"), rs.getString("tag_notes"));
-                list.add(tags);
+                Tags tag = new Tags(rs.getInt("id"), rs.getString("tag_name"), rs.getString("tag_color"), rs.getString("tag_notes"));
+                list.add(tag);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("查询所有标签失败", e);
         }
         return list;
     }
 
     /**
-     * 根据联系人来查找分组和标签列表
+     * 根据联系人来查找分组列表
      */
     @Override
     public List<Groups> findGroupsByContact(int id) {
         List<Groups> list = new ArrayList<>();
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                    select g.group_name,g.id,g.group_notes
-                        from groups g join contacts_group cg
-                    on g.id = cg.group_id
-                    join contacts c 
-                    on c.id = cg.contacts_id
-                    where c.id  = ?;
-                    """);
+        String sql = """
+                SELECT g.id, g.group_name, g.group_notes
+                FROM groups g
+                JOIN contacts_group cg ON g.id = cg.group_id
+                WHERE cg.contacts_id = ?
+                """;
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                Groups groups = new Groups(rs.getInt("id"), rs.getString("group_name"), rs.getString("group_notes"));
-                list.add(groups);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Groups group = new Groups(rs.getInt("id"), rs.getString("group_name"), rs.getString("group_notes"));
+                    list.add(group);
+                }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("查询联系人所属分组失败, contactId={}", id, e);
         }
         return list;
     }
 
     /**
-     * 根据联系人ID查找标签组
+     * 根据联系人ID查找标签列表
      */
+    @Override
     public List<Tags> findTagsByContact(int id) {
         List<Tags> list = new ArrayList<>();
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                    select t.id,t.tag_name,tag_color,t.tag_notes
-                        from tags t join tag_contacts tc
-                    on t.id = tc.tag_id
-                    join contacts c 
-                    on c.id = tc.contacts_id
-                    where c.id  = ?;
-                    """);
+        String sql = """
+                SELECT t.id, t.tag_name, t.tag_color, t.tag_notes
+                FROM tags t
+                JOIN tag_contacts tc ON t.id = tc.tag_id
+                WHERE tc.contacts_id = ?
+                """;
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                Tags tags = new Tags(rs.getInt("id"), rs.getString("tag_name"), rs.getString("tag_color"), rs.getString("tag_notes"));
-                list.add(tags);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Tags tag = new Tags(rs.getInt("id"), rs.getString("tag_name"), rs.getString("tag_color"), rs.getString("tag_notes"));
+                    list.add(tag);
+                }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("查询联系人所属标签失败, contactId={}", id, e);
         }
         return list;
     }
 
     /**
-     * 从rs中获取Contact对象，省略重复代码
-     *
+     * 从ResultSet中获取Contact对象
      */
-    private Contacts getContactsFromRsNext(ResultSet rs) {
-        Contacts con = null;
-        try {
-            con = new Contacts(rs.getInt("id"), rs.getString("name"), rs.getString("tele1"), rs.getString("tele2"), rs.getString("home"), rs.getString("email"), rs.getString("notes"));
-            return con;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return con;
+    private Contacts getContactsFromRsNext(ResultSet rs) throws SQLException {
+        return new Contacts(
+                rs.getInt("id"),
+                rs.getString("name"),
+                rs.getString("tele1"),
+                rs.getString("tele2"),
+                rs.getString("home"),
+                rs.getString("email"),
+                rs.getString("notes")
+        );
     }
 
     /**
@@ -917,22 +509,18 @@ public class ContactsDaoImpl implements ContactsDao {
      */
     @Override
     public List<String> writeVcfFileInService(BufferedWriter bw) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
         List<String> resultList = new ArrayList<>();
-        try {
-            conn = DBUtil.getConnection();
-            ps = conn.prepareStatement("""
-                        select c.name,c.tele1,c.tele2,c.home,c.email,c.notes,g.group_name,t.tag_name
-                            from contacts c 
-                                join contacts_group cg  on c.id = cg.contacts_id 
-                                join groups g           on g.id = cg.group_id
-                                join tag_contacts tc    on c.id = tc.contacts_id
-                                join tags t             on t.id = tc.tag_id;
-                    """);
-            rs = ps.executeQuery();
-
+        String sql = """
+                SELECT c.name, c.tele1, c.tele2, c.home, c.email, c.notes, g.group_name, t.tag_name
+                FROM contacts c
+                JOIN contacts_group cg ON c.id = cg.contacts_id
+                JOIN groups g ON g.id = cg.group_id
+                JOIN tag_contacts tc ON c.id = tc.contacts_id
+                JOIN tags t ON t.id = tc.tag_id
+                """;
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 String line = rs.getString(1) + "," +
                         rs.getString(2) + "," +
@@ -945,23 +533,7 @@ public class ContactsDaoImpl implements ContactsDao {
                 resultList.add(line);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (ps != null) ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.error("导出联系人到VCF失败", e);
         }
         return resultList;
     }

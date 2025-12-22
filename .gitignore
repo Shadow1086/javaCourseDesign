@@ -35,6 +35,8 @@ build/
 ### Mac OS ###
 .DS_Store
 
+### Logs ###
+logs/
 
 .spec-workflow
 
