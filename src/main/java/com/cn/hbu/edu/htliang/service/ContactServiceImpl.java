@@ -102,12 +102,14 @@ public class ContactServiceImpl implements ContactService {
      * @param id : 要删除的联系人的ID
      */
     @Override
-    public void deleteById(int id) {
+    public boolean deleteById(int id) {
         if (dao.exists(id)) {
             dao.deleteById(id);
             logger.debug("删除联系人成功, id={}", id);
+            return true;
         } else {
             logger.warn("删除失败，未找到ID为{}的联系人", id);
+            return false;
         }
     }
 
@@ -121,24 +123,20 @@ public class ContactServiceImpl implements ContactService {
             return false;
         }
         try {
-            Contacts con = dao.findById(id);
-            if (newName == null) {
-                newName = con.getName();
-            } else {
-                if (!ValidationUtil.isValidName(newName)) {
-                    logger.error("修改ID为：{} 的联系人失败，原因：姓名格式不正确", id);
-                    return false;
-                }
+            if (!ValidationUtil.isValidName(newName)) {
+                logger.error("修改ID为：{} 的联系人失败，原因：姓名格式不正确", id);
+                return false;
             }
             if (!ValidationUtil.isValidTele(newTele1)) {
                 logger.error("修改ID为：{}的联系人信息错误：原因：电话号格式错误", id);
                 return false;
             }
-            if (!ValidationUtil.isValidTele(newTele2)) {
+            if (newTele2 != null && !newTele2.isBlank() && !ValidationUtil.isValidTele(newTele2)) {
                 logger.error("修改ID为：{}的联系人信息错误：原因：电话号格式错误", id);
                 return false;
             }
-            if (!ValidationUtil.isValidEmail(newEmail)) {
+
+            if (newEmail != null && !newEmail.isBlank() && !ValidationUtil.isValidEmail(newEmail)) {
                 logger.error("修改ID为：{}的联系人信息错误：原因：邮箱格式错误", id);
                 return false;
             }

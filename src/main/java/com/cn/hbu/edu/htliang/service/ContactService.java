@@ -41,7 +41,7 @@ public interface ContactService {
     /**
      * 根据ID删除联系人
      */
-    void deleteById(int id);
+    boolean deleteById(int id);
 
     /**
      * 根据ID来更改联系人信息
