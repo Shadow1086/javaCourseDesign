@@ -1,0 +1,167 @@
+2025-12-23 17:18:52 INFO  com.cn.hbu.edu.htliang.view.MainGUI - app start
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - HikariPool-1 - configuration:
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - allowPoolSuspension.............false
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - autoCommit......................true
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - catalog.........................none
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - connectionInitSql...............none
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - connectionTestQuery.............none
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - connectionTimeout...............30000
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - dataSource......................none
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - dataSourceClassName.............none
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - dataSourceJNDI..................none
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - dataSourceProperties............{password=<masked>}
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - driverClassName.................none
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - exceptionOverrideClassName......none
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - healthCheckProperties...........{}
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - healthCheckRegistry.............none
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - idleTimeout.....................300000
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - initializationFailTimeout.......1
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - isolateInternalQueries..........false
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - jdbcUrl.........................jdbc:sqlite:contacts.sqlite
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - keepaliveTime...................0
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - leakDetectionThreshold..........0
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - maxLifetime.....................1800000
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - maximumPoolSize.................3
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - metricRegistry..................none
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - metricsTrackerFactory...........none
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - minimumIdle.....................1
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - password........................<masked>
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - poolName........................"HikariPool-1"
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - readOnly........................false
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - registerMbeans..................false
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - scheduledExecutor...............none
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - schema..........................none
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - threadFactory...................internal
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - transactionIsolation............default
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - username........................none
+2025-12-23 17:18:53 DEBUG com.zaxxer.hikari.HikariConfig - validationTimeout...............5000
+2025-12-23 17:18:53 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-12-23 17:18:53 DEBUG c.z.hikari.util.DriverDataSource - Loaded driver with class name org.sqlite.JDBC for jdbcUrl=jdbc:sqlite:contacts.sqlite
+2025-12-23 17:18:54 INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.sqlite.jdbc4.JDBC4Connection@99b12d3
+2025-12-23 17:18:54 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-12-23 17:18:54 DEBUG c.c.h.e.h.service.ContactServiceImpl - 查询到0条联系人
+2025-12-23 17:18:54 DEBUG c.c.h.e.h.service.ContactServiceImpl - 查询到0条联系人
+2025-12-23 17:18:54 DEBUG c.c.h.e.h.service.ContactServiceImpl - 查询到0条联系人
+2025-12-23 17:18:54 DEBUG c.c.h.e.h.service.ContactServiceImpl - 查询到0条联系人
+2025-12-23 17:18:54 DEBUG c.c.h.e.h.service.ContactServiceImpl - 查询到0条联系人
+2025-12-23 17:18:54 DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Before cleanup stats (total=1, active=0, idle=1, waiting=0)
+2025-12-23 17:18:54 DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - After cleanup  stats (total=1, active=0, idle=1, waiting=0)
+2025-12-23 17:18:54 DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Fill pool skipped, pool has sufficient level or currently being filled.
+2025-12-23 17:24:43 INFO  com.cn.hbu.edu.htliang.view.MainGUI - app start
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - HikariPool-1 - configuration:
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - allowPoolSuspension.............false
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - autoCommit......................true
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - catalog.........................none
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - connectionInitSql...............none
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - connectionTestQuery.............none
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - connectionTimeout...............30000
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - dataSource......................none
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - dataSourceClassName.............none
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - dataSourceJNDI..................none
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - dataSourceProperties............{password=<masked>}
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - driverClassName.................none
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - exceptionOverrideClassName......none
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - healthCheckProperties...........{}
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - healthCheckRegistry.............none
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - idleTimeout.....................300000
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - initializationFailTimeout.......1
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - isolateInternalQueries..........false
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - jdbcUrl.........................jdbc:sqlite:contacts.sqlite
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - keepaliveTime...................0
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - leakDetectionThreshold..........0
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - maxLifetime.....................1800000
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - maximumPoolSize.................3
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - metricRegistry..................none
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - metricsTrackerFactory...........none
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - minimumIdle.....................1
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - password........................<masked>
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - poolName........................"HikariPool-1"
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - readOnly........................false
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - registerMbeans..................false
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - scheduledExecutor...............none
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - schema..........................none
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - threadFactory...................internal
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - transactionIsolation............default
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - username........................none
+2025-12-23 17:24:44 DEBUG com.zaxxer.hikari.HikariConfig - validationTimeout...............5000
+2025-12-23 17:24:44 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-12-23 17:24:44 DEBUG c.z.hikari.util.DriverDataSource - Loaded driver with class name org.sqlite.JDBC for jdbcUrl=jdbc:sqlite:contacts.sqlite
+2025-12-23 17:24:45 INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.sqlite.jdbc4.JDBC4Connection@4908a758
+2025-12-23 17:24:45 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-12-23 17:24:45 DEBUG c.c.h.e.h.service.ContactServiceImpl - 查询到0条联系人
+2025-12-23 17:24:45 DEBUG c.c.h.e.h.service.ContactServiceImpl - 查询到0条联系人
+2025-12-23 17:24:45 DEBUG c.c.h.e.h.service.ContactServiceImpl - 查询到0条联系人
+2025-12-23 17:24:45 DEBUG c.c.h.e.h.service.ContactServiceImpl - 查询到0条联系人
+2025-12-23 17:24:45 DEBUG c.c.h.e.h.service.ContactServiceImpl - 查询到0条联系人
+2025-12-23 17:24:45 DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Before cleanup stats (total=1, active=0, idle=1, waiting=0)
+2025-12-23 17:24:45 DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - After cleanup  stats (total=1, active=0, idle=1, waiting=0)
+2025-12-23 17:24:45 DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Fill pool skipped, pool has sufficient level or currently being filled.
+2025-12-23 17:57:39 INFO  com.cn.hbu.edu.htliang.view.MainGUI - app start
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - HikariPool-1 - configuration:
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - allowPoolSuspension.............false
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - autoCommit......................true
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - catalog.........................none
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - connectionInitSql...............none
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - connectionTestQuery.............none
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - connectionTimeout...............30000
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - dataSource......................none
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - dataSourceClassName.............none
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - dataSourceJNDI..................none
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - dataSourceProperties............{password=<masked>}
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - driverClassName.................none
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - exceptionOverrideClassName......none
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - healthCheckProperties...........{}
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - healthCheckRegistry.............none
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - idleTimeout.....................300000
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - initializationFailTimeout.......1
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - isolateInternalQueries..........false
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - jdbcUrl.........................jdbc:sqlite:contacts.sqlite
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - keepaliveTime...................0
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - leakDetectionThreshold..........0
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - maxLifetime.....................1800000
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - maximumPoolSize.................3
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - metricRegistry..................none
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - metricsTrackerFactory...........none
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - minimumIdle.....................1
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - password........................<masked>
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - poolName........................"HikariPool-1"
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - readOnly........................false
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - registerMbeans..................false
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - scheduledExecutor...............none
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - schema..........................none
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - threadFactory...................internal
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - transactionIsolation............default
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - username........................none
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.HikariConfig - validationTimeout...............5000
+2025-12-23 17:57:40 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-12-23 17:57:40 DEBUG c.z.hikari.util.DriverDataSource - Loaded driver with class name org.sqlite.JDBC for jdbcUrl=jdbc:sqlite:contacts.sqlite
+2025-12-23 17:57:40 INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.sqlite.jdbc4.JDBC4Connection@409f19df
+2025-12-23 17:57:40 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-12-23 17:57:40 DEBUG c.c.h.e.h.service.ContactServiceImpl - 查询到0条联系人
+2025-12-23 17:57:40 DEBUG c.c.h.e.h.service.ContactServiceImpl - 查询到0条联系人
+2025-12-23 17:57:40 DEBUG c.c.h.e.h.service.ContactServiceImpl - 查询到0条联系人
+2025-12-23 17:57:40 DEBUG c.c.h.e.h.service.ContactServiceImpl - 查询到0条联系人
+2025-12-23 17:57:40 DEBUG c.c.h.e.h.service.ContactServiceImpl - 查询到0条联系人
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Before cleanup stats (total=1, active=0, idle=1, waiting=0)
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - After cleanup  stats (total=1, active=0, idle=1, waiting=0)
+2025-12-23 17:57:40 DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Fill pool skipped, pool has sufficient level or currently being filled.
+2025-12-23 17:59:19 DEBUG c.c.h.e.h.service.ContactServiceImpl - 导出联系人文件成功: contacts-export16080187372897718101.vcf
+2025-12-23 17:59:19 ERROR c.c.h.e.h.service.ContactServiceImpl - 添加联系人失败：联系人姓名格式不正确，请重新检查
+2025-12-23 17:59:19 DEBUG c.c.h.e.h.service.ContactServiceImpl - 添加联系人成功: Contacts{id=1, name='张三', tele1='13800138000', tele2='null', home='Beijing', email='user@example.com', notes='notes'}
+2025-12-23 17:59:19 WARN  c.c.h.e.h.service.ContactServiceImpl - 修改失败，未找到ID为1的联系人
+2025-12-23 17:59:19 ERROR c.c.h.e.h.service.ContactServiceImpl - 修改ID为：1 的联系人失败，原因：姓名格式不正确
+2025-12-23 17:59:19 ERROR c.c.h.e.h.service.ContactServiceImpl - 修改ID为：1的联系人信息错误：原因：电话号格式错误
+2025-12-23 17:59:19 ERROR c.c.h.e.h.service.ContactServiceImpl - 修改ID为：1的联系人信息错误：原因：邮箱格式错误
+2025-12-23 17:59:19 DEBUG c.c.h.e.h.service.ContactServiceImpl - 修改联系人成功, id=1
+2025-12-23 17:59:19 WARN  c.c.h.e.h.service.ContactServiceImpl - 未找到ID为99的联系人
+2025-12-23 17:59:19 DEBUG c.c.h.e.h.service.ContactServiceImpl - 从文件导入1条联系人
+2025-12-23 17:59:19 WARN  c.c.h.e.h.service.ContactServiceImpl - 未找到姓名为nobody的联系人
+2025-12-23 17:59:19 WARN  c.c.h.e.h.service.ContactServiceImpl - 创建分组失败：名称不能为空
+2025-12-23 17:59:19 WARN  c.c.h.e.h.service.ContactServiceImpl - 删除分组失败：组名为空
+2025-12-23 17:59:19 WARN  c.c.h.e.h.service.ContactServiceImpl - 查询分组联系人失败：组名为空
+2025-12-23 17:59:19 WARN  c.c.h.e.h.service.ContactServiceImpl - 新建标签失败：颜色不能为空
+2025-12-23 17:59:19 WARN  c.c.h.e.h.service.ContactServiceImpl - 删除标签失败：颜色为空
+2025-12-23 17:59:19 WARN  c.c.h.e.h.service.ContactServiceImpl - 查询标签联系人失败：颜色为空
+2025-12-23 17:59:19 WARN  c.c.h.e.h.service.ContactServiceImpl - 添加联系人到分组失败：列表为空
+2025-12-23 17:59:19 WARN  c.c.h.e.h.service.ContactServiceImpl - 添加联系人到标签失败：列表为空
+2025-12-23 17:59:19 ERROR c.c.h.e.h.service.ContactServiceImpl - 通过电话号查询联系人中输入电话号不合法
