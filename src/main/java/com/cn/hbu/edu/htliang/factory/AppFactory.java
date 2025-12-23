@@ -13,12 +13,12 @@ import com.cn.hbu.edu.htliang.service.ContactServiceImpl;
  * @author htLiang
  */
 public class AppFactory {
-    //Dao层的工厂
+    // Dao层的工厂
     public static ContactsDao createContactsDao() {
         return new ContactsDaoImpl();
     }
 
-    //Service
+    // Service
     public static ContactService createContactService() {
         return new ContactServiceImpl(createContactsDao());
     }

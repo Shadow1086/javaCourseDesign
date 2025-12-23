@@ -12,25 +12,28 @@ import java.util.regex.Pattern;
  * @author htLiang
  */
 public class ValidationUtil {
-    private static final Pattern TELE_PATTERN = Pattern.compile("1\\d{10}");    //格式：1xx xxxx xxxx
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{3,}$");  //格式：xxxxx@xxx.xxx
-    private static final Pattern NAME_PATTERN = Pattern.compile("^[\\u4e00-\\u9fa5a-zA-Z\\s]{2,50}$");      //格式：中英文可以混合
+    private static final Pattern TELE_PATTERN = Pattern.compile("1\\d{10}"); // 格式：1xx xxxx xxxx
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{3,}$"); // 格式：xxxxx@xxx.xxx
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[\\u4e00-\\u9fa5a-zA-Z\\s]{2,50}$"); // 格式：中英文可以混合
 
-    //判断手机号
+    // 判断手机号
     public static boolean isValidName(String name) {
-        if (name == null || name.isBlank()) return false;
+        if (name == null || name.isBlank())
+            return false;
         return NAME_PATTERN.matcher(name.trim()).matches();
     }
 
-    //判断电话号
+    // 判断电话号
     public static boolean isValidTele(String tele) {
-        if (tele == null || tele.isBlank()) return false;
+        if (tele == null || tele.isBlank())
+            return false;
         return TELE_PATTERN.matcher(tele.trim()).matches();
     }
 
-    //判断邮箱格式
+    // 判断邮箱格式
     public static boolean isValidEmail(String email) {
-        if (email == null || email.isBlank()) return false;
+        if (email == null || email.isBlank())
+            return false;
         return EMAIL_PATTERN.matcher(email.trim()).matches();
     }
 
@@ -66,16 +69,16 @@ public class ValidationUtil {
         return ValidationResult.success();
     }
 
-    //验证结果类
-        public record ValidationResult(boolean valid, String message) {
+    // 验证结果类
+    public record ValidationResult(boolean valid, String message) {
 
         public static ValidationResult success() {
-                return new ValidationResult(true, null);
-            }
+            return new ValidationResult(true, null);
+        }
 
-            public static ValidationResult error(String message) {
-                return new ValidationResult(false, message);
-            }
+        public static ValidationResult error(String message) {
+            return new ValidationResult(false, message);
+        }
 
         public boolean isValid() {
             return valid;
@@ -84,6 +87,6 @@ public class ValidationUtil {
         public String getMessage() {
             return message;
         }
-        }
+    }
 
 }

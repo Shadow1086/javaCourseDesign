@@ -24,12 +24,13 @@ import java.util.List;
 public class ContactServiceImpl implements ContactService {
     private final ContactsDao dao;
 
-    //工厂模式，由外部决定使用什么数据库，可以通过dao层控制切换数据库
+    // 工厂模式，由外部决定使用什么数据库，可以通过dao层控制切换数据库
     public ContactServiceImpl(ContactsDao contactsDao) {
         this.dao = contactsDao;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(ContactServiceImpl.class);
+
     /**
      * 添加单个联系人
      * 姓名等所有信息都需要添加到形参，除了ID
@@ -37,7 +38,7 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public boolean addContact(String name, String tele1, String tele2, String home, String email, String notes) {
         ValidationResult result = ValidationUtil.validateContact(name, tele1, tele2, email);
-        if (!result.isValid()) {  //不合法的话
+        if (!result.isValid()) { // 不合法的话
             logger.error("添加联系人失败：{}", result.getMessage());
             return false;
         }
@@ -63,14 +64,16 @@ public class ContactServiceImpl implements ContactService {
         logger.warn("未找到ID为{}的联系人", id);
         return null;
     }
+
     /**
-    * 查询所有联系人
-    */
-    public List<Contacts> findAll(){
+     * 查询所有联系人
+     */
+    public List<Contacts> findAll() {
         List<Contacts> result = dao.findAll();
         logger.debug("查询到{}条联系人", result.size());
         return result;
     }
+
     /**
      * 根据姓名查找联系人
      */
@@ -85,11 +88,11 @@ public class ContactServiceImpl implements ContactService {
     }
 
     /**
-    * 通过手机号查询
-    */
+     * 通过手机号查询
+     */
     public List<Contacts> findByTele(String tele) {
         if (!ValidationUtil.isValidTele(tele)) {
-            //如果输入电话号不合法
+            // 如果输入电话号不合法
             logger.error("通过电话号查询联系人中输入电话号不合法");
             return null;
         } else {
@@ -99,6 +102,7 @@ public class ContactServiceImpl implements ContactService {
 
     /**
      * 根据ID删除联系人
+     * 
      * @param id : 要删除的联系人的ID
      */
     @Override
@@ -117,7 +121,8 @@ public class ContactServiceImpl implements ContactService {
      * 根据ID修改联系人信息
      */
     @Override
-    public boolean updateContactInfo(int id, String newName, String newTele1, String newTele2, String newHome, String newEmail, String newNotes) {
+    public boolean updateContactInfo(int id, String newName, String newTele1, String newTele2, String newHome,
+            String newEmail, String newNotes) {
         if (!dao.exists(id)) {
             logger.warn("修改失败，未找到ID为{}的联系人", id);
             return false;
@@ -149,7 +154,7 @@ public class ContactServiceImpl implements ContactService {
         }
     }
 
-//分组操作
+    // 分组操作
 
     /**
      * 创建新分组
@@ -212,7 +217,7 @@ public class ContactServiceImpl implements ContactService {
         return dao.findAllGroup();
     }
 
-//标签操作
+    // 标签操作
 
     /**
      * 新建标签
@@ -316,7 +321,8 @@ public class ContactServiceImpl implements ContactService {
             String line;
             Contacts con = null;
             while ((line = br.readLine()) != null) {
-                if (line.equalsIgnoreCase("BEGIN:VCARD")) con = new Contacts();
+                if (line.equalsIgnoreCase("BEGIN:VCARD"))
+                    con = new Contacts();
                 else if (line.equalsIgnoreCase("END:vcard")) {
                     if (con != null) {
                         list.add(con);
@@ -330,7 +336,8 @@ public class ContactServiceImpl implements ContactService {
             logger.error("读取VCF文件失败: {}", file.getName(), e);
         } finally {
             try {
-                if (br != null) br.close();
+                if (br != null)
+                    br.close();
             } catch (IOException e) {
                 logger.error("关闭文件流失败", e);
             }
@@ -343,8 +350,7 @@ public class ContactServiceImpl implements ContactService {
      */
     public void parseEachRowInVcf(String line, Contacts con) {
         if (line.startsWith("VERSION:")) {
-        }
-        else if (line.startsWith("N:") || line.startsWith("N;")) {
+        } else if (line.startsWith("N:") || line.startsWith("N;")) {
             String name = "";
             String[] nameList = line.split(";", -1);
             for (String part : nameList) {
@@ -357,7 +363,8 @@ public class ContactServiceImpl implements ContactService {
                 if (con.getTele1() == null || con.getTele1().isBlank()) {
                     con.setTele1(value);
                 } else if (con.getTele2() == null || con.getTele2().isBlank()) {
-                    if (!con.getTele1().equals(value)) con.setTele2(value);
+                    if (!con.getTele1().equals(value))
+                        con.setTele2(value);
                 } else {
                     logger.debug("多余的电话号保存在备注中: {}", value);
                     if (con.getNotes() != null) {
@@ -379,7 +386,8 @@ public class ContactServiceImpl implements ContactService {
             value = "";
             for (int i = list.length - 1; i >= 0; i--) {
                 value += (list[i]);
-                if (i > 0) value += ",";
+                if (i > 0)
+                    value += ",";
             }
             con.setHome(value);
         } else if (line.startsWith("NOTE")) {
@@ -422,9 +430,12 @@ public class ContactServiceImpl implements ContactService {
                 writeProp(bw, "EMAIL", part[4]);
 
                 String notes = "";
-                if (hasValue(part[5])) notes += part[5]; //备注本身
-                if (hasValue(part[6])) notes += "X-GROUP : " + part[6]; //分组信息
-                if (hasValue(part[7])) notes += "X-TAG : " + part[7];
+                if (hasValue(part[5]))
+                    notes += part[5]; // 备注本身
+                if (hasValue(part[6]))
+                    notes += "X-GROUP : " + part[6]; // 分组信息
+                if (hasValue(part[7]))
+                    notes += "X-TAG : " + part[7];
 
                 writeProp(bw, "NOTE", notes);
 
@@ -443,16 +454,19 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public int importVcfFile(File file) {
         List<Contacts> contacts = readVcfFile(file);
-        if (contacts == null || contacts.isEmpty()) return 0;
+        if (contacts == null || contacts.isEmpty())
+            return 0;
 
         List<Contacts> readyToInsert = new ArrayList<>();
         for (Contacts c : contacts) {
-            if (c == null) continue;
+            if (c == null)
+                continue;
             if ((c.getTele1() == null || c.getTele1().isBlank()) && hasValue(c.getTele2())) {
                 c.setTele1(c.getTele2());
                 c.setTele2(null);
             }
-            if (!hasValue(c.getName()) || !hasValue(c.getTele1())) continue;
+            if (!hasValue(c.getName()) || !hasValue(c.getTele1()))
+                continue;
             readyToInsert.add(c);
         }
         if (readyToInsert.isEmpty()) {

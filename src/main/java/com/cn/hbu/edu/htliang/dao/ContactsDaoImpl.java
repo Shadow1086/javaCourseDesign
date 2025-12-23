@@ -29,7 +29,7 @@ public class ContactsDaoImpl implements ContactsDao {
     public void insert(Contacts con) {
         String sql = "INSERT INTO contacts (name, tele1, tele2, home, email, notes) VALUES (?,?,?,?,?,?)";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, con.getName());
             ps.setString(2, con.getTele1());
             ps.setString(3, con.getTele2());
@@ -54,7 +54,7 @@ public class ContactsDaoImpl implements ContactsDao {
     public void batchInsert(List<Contacts> contacts) {
         String sql = "INSERT INTO contacts (name, tele1, tele2, home, email, notes) VALUES (?,?,?,?,?,?)";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             for (Contacts con : contacts) {
                 ps.setString(1, con.getName());
                 ps.setString(2, con.getTele1());
@@ -78,7 +78,7 @@ public class ContactsDaoImpl implements ContactsDao {
     public Contacts findById(int id) {
         String sql = "SELECT * FROM contacts WHERE id = ?";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -99,8 +99,8 @@ public class ContactsDaoImpl implements ContactsDao {
         List<Contacts> list = new ArrayList<>();
         String sql = "SELECT * FROM contacts";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(getContactsFromRsNext(rs));
             }
@@ -120,7 +120,7 @@ public class ContactsDaoImpl implements ContactsDao {
         List<Contacts> list = new ArrayList<>();
         String sql = "SELECT * FROM contacts WHERE name LIKE ?";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "%" + name + "%");
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -141,7 +141,7 @@ public class ContactsDaoImpl implements ContactsDao {
         List<Contacts> list = new ArrayList<>();
         String sql = "SELECT * FROM contacts WHERE tele1 = ? OR tele2 = ?";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, tele);
             ps.setString(2, tele);
             try (ResultSet rs = ps.executeQuery()) {
@@ -162,7 +162,7 @@ public class ContactsDaoImpl implements ContactsDao {
     public void update(Contacts con) {
         String sql = "UPDATE contacts SET name=?, tele1=?, tele2=?, home=?, email=?, notes=? WHERE id=?";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, con.getName());
             ps.setString(2, con.getTele1());
             ps.setString(3, con.getTele2());
@@ -180,10 +180,11 @@ public class ContactsDaoImpl implements ContactsDao {
      * 根据ID更新数据
      */
     @Override
-    public void updateInfo(int id, String newName, String newTele1, String newTele2, String newHome, String newEmail, String newNotes) {
+    public void updateInfo(int id, String newName, String newTele1, String newTele2, String newHome, String newEmail,
+            String newNotes) {
         String sql = "UPDATE contacts SET name=?, tele1=?, tele2=?, home=?, email=?, notes=? WHERE id=?";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, newName);
             ps.setString(2, newTele1);
             ps.setString(3, newTele2);
@@ -204,7 +205,7 @@ public class ContactsDaoImpl implements ContactsDao {
     public void deleteById(int id) {
         String sql = "DELETE FROM contacts WHERE id = ?";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -219,7 +220,7 @@ public class ContactsDaoImpl implements ContactsDao {
     public boolean exists(int id) {
         String sql = "SELECT 1 FROM contacts WHERE id = ?";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
@@ -237,7 +238,7 @@ public class ContactsDaoImpl implements ContactsDao {
     public boolean addGroup(String name, String notes) {
         String sql = "INSERT INTO groups (group_name, group_notes) VALUES (?,?)";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
             ps.setString(2, notes);
             ps.executeUpdate();
@@ -255,7 +256,7 @@ public class ContactsDaoImpl implements ContactsDao {
     public boolean addContactInGroup(Contacts con, Groups group) {
         String sql = "INSERT INTO contacts_group (contacts_id, group_id) VALUES (?,?)";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, con.getId());
             ps.setInt(2, group.getId());
             ps.executeUpdate();
@@ -273,7 +274,7 @@ public class ContactsDaoImpl implements ContactsDao {
     public boolean deleteGroup(String name) {
         String sql = "DELETE FROM groups WHERE group_name = ?";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
             ps.executeUpdate();
             return true;
@@ -297,7 +298,7 @@ public class ContactsDaoImpl implements ContactsDao {
                 WHERE g.group_name = ?
                 """;
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -318,8 +319,8 @@ public class ContactsDaoImpl implements ContactsDao {
         List<Groups> list = new ArrayList<>();
         String sql = "SELECT * FROM groups";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Groups group = new Groups(rs.getInt("id"), rs.getString("group_name"), rs.getString("group_notes"));
                 list.add(group);
@@ -330,7 +331,7 @@ public class ContactsDaoImpl implements ContactsDao {
         return list;
     }
 
-//标签操作
+    // 标签操作
 
     /**
      * 新建标签
@@ -339,7 +340,7 @@ public class ContactsDaoImpl implements ContactsDao {
     public boolean addTag(String color, String name, String notes) {
         String sql = "INSERT INTO tags (tag_color, tag_name, tag_notes) VALUES (?,?,?)";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, color);
             ps.setString(2, name);
             ps.setString(3, notes);
@@ -358,7 +359,7 @@ public class ContactsDaoImpl implements ContactsDao {
     public boolean deleteTag(String color) {
         String sql = "DELETE FROM tags WHERE tag_color = ?";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, color);
             ps.executeUpdate();
             return true;
@@ -375,7 +376,7 @@ public class ContactsDaoImpl implements ContactsDao {
     public boolean addContactToTag(Contacts con, Tags tag) {
         String sql = "INSERT INTO tag_contacts (contacts_id, tag_id) VALUES (?,?)";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, con.getId());
             ps.setInt(2, tag.getId());
             ps.executeUpdate();
@@ -400,7 +401,7 @@ public class ContactsDaoImpl implements ContactsDao {
                 WHERE t.tag_color = ?
                 """;
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, color);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -421,10 +422,11 @@ public class ContactsDaoImpl implements ContactsDao {
         List<Tags> list = new ArrayList<>();
         String sql = "SELECT * FROM tags";
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                Tags tag = new Tags(rs.getInt("id"), rs.getString("tag_name"), rs.getString("tag_color"), rs.getString("tag_notes"));
+                Tags tag = new Tags(rs.getInt("id"), rs.getString("tag_name"), rs.getString("tag_color"),
+                        rs.getString("tag_notes"));
                 list.add(tag);
             }
         } catch (SQLException e) {
@@ -446,7 +448,7 @@ public class ContactsDaoImpl implements ContactsDao {
                 WHERE cg.contacts_id = ?
                 """;
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -473,11 +475,12 @@ public class ContactsDaoImpl implements ContactsDao {
                 WHERE tc.contacts_id = ?
                 """;
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Tags tag = new Tags(rs.getInt("id"), rs.getString("tag_name"), rs.getString("tag_color"), rs.getString("tag_notes"));
+                    Tags tag = new Tags(rs.getInt("id"), rs.getString("tag_name"), rs.getString("tag_color"),
+                            rs.getString("tag_notes"));
                     list.add(tag);
                 }
             }
@@ -498,8 +501,7 @@ public class ContactsDaoImpl implements ContactsDao {
                 rs.getString("tele2"),
                 rs.getString("home"),
                 rs.getString("email"),
-                rs.getString("notes")
-        );
+                rs.getString("notes"));
     }
 
     /**
@@ -513,14 +515,14 @@ public class ContactsDaoImpl implements ContactsDao {
         String sql = """
                 SELECT c.name, c.tele1, c.tele2, c.home, c.email, c.notes, g.group_name, t.tag_name
                 FROM contacts c
-                JOIN contacts_group cg ON c.id = cg.contacts_id
-                JOIN groups g ON g.id = cg.group_id
-                JOIN tag_contacts tc ON c.id = tc.contacts_id
-                JOIN tags t ON t.id = tc.tag_id
+                LEFT JOIN contacts_group cg ON c.id = cg.contacts_id
+                LEFT JOIN groups g ON g.id = cg.group_id
+                LEFT JOIN tag_contacts tc ON c.id = tc.contacts_id
+                LEFT JOIN tags t ON t.id = tc.tag_id
                 """;
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 String line = rs.getString(1) + "," +
                         rs.getString(2) + "," +
@@ -534,6 +536,7 @@ public class ContactsDaoImpl implements ContactsDao {
             }
         } catch (SQLException e) {
             logger.error("导出联系人到VCF失败", e);
+            // throw new DataAccessException("导出联系人到VCF失败",e);
         }
         return resultList;
     }

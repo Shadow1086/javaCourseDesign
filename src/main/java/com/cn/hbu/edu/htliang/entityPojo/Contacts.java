@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * ClassName: Contacts
- * Description: 
+ * Description:
  * 
  * 通讯录中联系人对象
  * 
@@ -23,7 +23,8 @@ public class Contacts {
     private List<Groups> groups;
     private List<Tags> tags;
 
-    public Contacts(){}
+    public Contacts() {
+    }
 
     public List<Groups> getGroups() {
         return groups;
@@ -63,42 +64,55 @@ public class Contacts {
     public Integer getId() {
         return id;
     }
-     public void setId(int id) {
-         this.id = id;
-     }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public String getTele1() {
         return tele1;
     }
+
     public void setTele1(String tele1) {
         this.tele1 = tele1;
     }
+
     public String getTele2() {
         return tele2;
     }
+
     public void setTele2(String tele2) {
         this.tele2 = tele2;
     }
+
     public String getHome() {
         return home;
     }
+
     public void setHome(String home) {
         this.home = home;
     }
+
     public String getEmail() {
         return email;
     }
+
     public void setEmail(String email) {
         this.email = email;
     }
+
     public String getNotes() {
         return notes;
     }
+
     public void setNotes(String notes) {
         this.notes = notes;
     }

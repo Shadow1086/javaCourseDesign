@@ -4,8 +4,9 @@ import com.cn.hbu.edu.htliang.entityPojo.Contacts;
 import com.cn.hbu.edu.htliang.entityPojo.Groups;
 import com.cn.hbu.edu.htliang.entityPojo.Tags;
 import com.cn.hbu.edu.htliang.service.ContactService;
-import com.cn.hbu.edu.htliang.service.ContactServiceImpl;
-import com.cn.hbu.edu.htliang.util.DBUtil;
+import com.cn.hbu.edu.htliang.util.DatabaseUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -22,13 +23,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
+import static com.cn.hbu.edu.htliang.factory.AppFactory.createContactService;
 
 /**
  * Swing 前端：联系人增删改查 + 分组/标签筛选与管理。
  * 仅修改 view 层，后端调用直接使用 ContactService。
  */
 public class MainGUI extends JFrame {
-    private final ContactService contactService = new ContactServiceImpl();
+    private static final Logger logger = LoggerFactory.getLogger(MainGUI.class);
+    private final ContactService contactService = createContactService();
 
     // 联系人表格
     private JTable contactTable;
@@ -52,6 +55,8 @@ public class MainGUI extends JFrame {
     }
 
     public static void main(String[] args) {
+        logger.info("app start");
+
         SwingUtilities.invokeLater(() -> {
             MainGUI app = new MainGUI();
             app.setVisible(true);
@@ -87,8 +92,7 @@ public class MainGUI extends JFrame {
         toolbar.setBackground(new Color(244, 247, 252));
         toolbar.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 226, 236)),
-                new EmptyBorder(8, 12, 8, 12)
-        ));
+                new EmptyBorder(8, 12, 8, 12)));
 
         Dimension btnSize = new Dimension(92, 34);
         Font btnFont = new Font("微软雅黑", Font.PLAIN, 13);
@@ -130,8 +134,7 @@ public class MainGUI extends JFrame {
         searchField.setPreferredSize(new Dimension(170, 32));
         searchField.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(200, 205, 215), 1, true),
-                new EmptyBorder(4, 8, 4, 8)
-        ));
+                new EmptyBorder(4, 8, 4, 8)));
         searchField.setToolTipText("输入姓名或电话，回车立即搜索");
         searchField.addActionListener(e -> onSearchButtonClick());
         toolbar.add(searchField);
@@ -165,7 +168,7 @@ public class MainGUI extends JFrame {
      * 表格数据刷新入口：{@link #refreshContactTable()} / {@link #displayContactList(List)}。
      */
     private JScrollPane buildContactTablePanel() {
-        String[] columnNames = {"ID", "姓名", "电话", "备用电话", "分组", "标签", "备注"};
+        String[] columnNames = { "ID", "姓名", "电话", "备用电话", "分组", "标签", "备注" };
         contactTableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -227,8 +230,7 @@ public class MainGUI extends JFrame {
         btn.setBackground(Color.WHITE);
         btn.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(205, 210, 220), 1, true),
-                new EmptyBorder(6, 16, 6, 16)
-        ));
+                new EmptyBorder(6, 16, 6, 16)));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.addActionListener(listener);
         return btn;
@@ -272,14 +274,15 @@ public class MainGUI extends JFrame {
 
     /**
      * 从“添加联系人”对话框输入框收集数据，组装为 {@link Contacts}。
-     * 注意：这里只负责采集与 trim，不做业务校验；校验在 {@link #onAddButtonClick(JDialog, JTextField, JTextField, JTextField, JTextField, JTextField, JTextArea)}。
+     * 注意：这里只负责采集与 trim，不做业务校验；校验在
+     * {@link #onAddButtonClick(JDialog, JTextField, JTextField, JTextField, JTextField, JTextField, JTextArea)}。
      */
     public Contacts collectAddContactInput(JTextField nameField,
-                                           JTextField phoneField,
-                                           JTextField backupPhoneField,
-                                           JTextField addressField,
-                                           JTextField emailField,
-                                           JTextArea notesArea) {
+            JTextField phoneField,
+            JTextField backupPhoneField,
+            JTextField addressField,
+            JTextField emailField,
+            JTextArea notesArea) {
         Contacts contact = new Contacts();
         contact.setName(nameField.getText().trim());
         contact.setTele1(phoneField.getText().trim());
@@ -295,13 +298,14 @@ public class MainGUI extends JFrame {
      * 调用：{@link #collectAddContactInput(JTextField, JTextField, JTextField, JTextField, JTextField, JTextArea)}。
      */
     public Contacts collectEditContactInput(int contactId,
-                                            JTextField nameField,
-                                            JTextField phoneField,
-                                            JTextField backupPhoneField,
-                                            JTextField addressField,
-                                            JTextField emailField,
-                                            JTextArea notesArea) {
-        Contacts contact = collectAddContactInput(nameField, phoneField, backupPhoneField, addressField, emailField, notesArea);
+            JTextField nameField,
+            JTextField phoneField,
+            JTextField backupPhoneField,
+            JTextField addressField,
+            JTextField emailField,
+            JTextArea notesArea) {
+        Contacts contact = collectAddContactInput(nameField, phoneField, backupPhoneField, addressField, emailField,
+                notesArea);
         contact.setId(contactId);
         return contact;
     }
@@ -354,7 +358,7 @@ public class MainGUI extends JFrame {
             }
             String groupNames = joinGroupNames(enriched);
             String tagNames = joinTagNames(enriched);
-            contactTableModel.addRow(new Object[]{
+            contactTableModel.addRow(new Object[] {
                     enriched.getId(),
                     enriched.getName(),
                     enriched.getTele1(),
@@ -391,8 +395,7 @@ public class MainGUI extends JFrame {
                 Objects.toString(contact.getHome(), ""),
                 joinGroupNames(contact),
                 joinTagNames(contact),
-                Objects.toString(contact.getNotes(), "")
-        );
+                Objects.toString(contact.getNotes(), ""));
         JOptionPane.showMessageDialog(this, detail, "联系人详情", JOptionPane.INFORMATION_MESSAGE);
     }
 
@@ -411,18 +414,20 @@ public class MainGUI extends JFrame {
      * 调用：{@link ContactService#addContact(String, String, String, String, String, String)}、{@link #refreshContactTable()}。
      */
     private void onAddButtonClick(JDialog dialog,
-                                  JTextField nameField,
-                                  JTextField phoneField,
-                                  JTextField backupPhoneField,
-                                  JTextField addressField,
-                                  JTextField emailField,
-                                  JTextArea notesArea) {
-        Contacts contact = collectAddContactInput(nameField, phoneField, backupPhoneField, addressField, emailField, notesArea);
+            JTextField nameField,
+            JTextField phoneField,
+            JTextField backupPhoneField,
+            JTextField addressField,
+            JTextField emailField,
+            JTextArea notesArea) {
+        Contacts contact = collectAddContactInput(nameField, phoneField, backupPhoneField, addressField, emailField,
+                notesArea);
         if (contact.getName().isEmpty() || contact.getTele1().isEmpty()) {
             JOptionPane.showMessageDialog(dialog, "姓名和电话不能为空！", "错误", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        contactService.addContact(contact.getName(), contact.getTele1(), contact.getTele2(), contact.getHome(), contact.getEmail(), contact.getNotes());
+        contactService.addContact(contact.getName(), contact.getTele1(), contact.getTele2(), contact.getHome(),
+                contact.getEmail(), contact.getNotes());
         refreshContactTable();
         displayMessage("添加成功");
         dialog.dispose();
@@ -434,19 +439,21 @@ public class MainGUI extends JFrame {
      * 调用：{@link ContactService#updateContactInfo(int, String, String, String, String, String, String)}、{@link #refreshContactTable()}。
      */
     private void onEditButtonClick(JDialog dialog,
-                                   int contactId,
-                                   JTextField nameField,
-                                   JTextField phoneField,
-                                   JTextField backupPhoneField,
-                                   JTextField addressField,
-                                   JTextField emailField,
-                                   JTextArea notesArea) {
-        Contacts contact = collectEditContactInput(contactId, nameField, phoneField, backupPhoneField, addressField, emailField, notesArea);
+            int contactId,
+            JTextField nameField,
+            JTextField phoneField,
+            JTextField backupPhoneField,
+            JTextField addressField,
+            JTextField emailField,
+            JTextArea notesArea) {
+        Contacts contact = collectEditContactInput(contactId, nameField, phoneField, backupPhoneField, addressField,
+                emailField, notesArea);
         if (contact.getName().isEmpty() || contact.getTele1().isEmpty()) {
             JOptionPane.showMessageDialog(dialog, "姓名和电话不能为空！", "错误", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        boolean ok = contactService.updateContactInfo(contactId, contact.getName(), contact.getTele1(), contact.getTele2(), contact.getHome(), contact.getEmail(), contact.getNotes());
+        boolean ok = contactService.updateContactInfo(contactId, contact.getName(), contact.getTele1(),
+                contact.getTele2(), contact.getHome(), contact.getEmail(), contact.getNotes());
         if (!ok) {
             displayMessage("更新失败，未找到联系人或数据有误");
             return;
@@ -462,9 +469,11 @@ public class MainGUI extends JFrame {
      */
     private void onDeleteButtonClick() {
         Integer contactId = collectDeleteContactInput();
-        if (contactId == null) return;
+        if (contactId == null)
+            return;
         int confirm = JOptionPane.showConfirmDialog(this, "确定删除选中的联系人吗？", "确认删除", JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) return;
+        if (confirm != JOptionPane.YES_OPTION)
+            return;
         contactService.deleteById(contactId);
         refreshContactTable();
         displayMessage("删除成功");
@@ -493,7 +502,8 @@ public class MainGUI extends JFrame {
      */
     private void onViewDetailButtonClick() {
         Integer contactId = collectViewDetailInput();
-        if (contactId == null) return;
+        if (contactId == null)
+            return;
         Contacts detail = contactService.findGroupTagsById(contactId);
         if (detail == null) {
             detail = contactService.findById(contactId);
@@ -523,7 +533,8 @@ public class MainGUI extends JFrame {
         chooser.setFileFilter(new FileNameExtensionFilter("vCard 文件 (*.vcf)", "vcf"));
 
         int result = chooser.showOpenDialog(this);
-        if (result != JFileChooser.APPROVE_OPTION) return;
+        if (result != JFileChooser.APPROVE_OPTION)
+            return;
         File file = chooser.getSelectedFile();
         if (file == null || !file.getName().toLowerCase().endsWith(".vcf")) {
             JOptionPane.showMessageDialog(this, "请选择 .vcf 文件", "错误", JOptionPane.ERROR_MESSAGE);
@@ -552,17 +563,21 @@ public class MainGUI extends JFrame {
         chooser.setSelectedFile(new File("contacts.vcf"));
 
         int result = chooser.showSaveDialog(this);
-        if (result != JFileChooser.APPROVE_OPTION) return;
+        if (result != JFileChooser.APPROVE_OPTION)
+            return;
 
         File selected = chooser.getSelectedFile();
-        if (selected == null) return;
+        if (selected == null)
+            return;
         File target = selected;
         if (!selected.getName().toLowerCase().endsWith(".vcf")) {
             target = new File(selected.getParentFile(), selected.getName() + ".vcf");
         }
         if (target.exists()) {
-            int confirm = JOptionPane.showConfirmDialog(this, "文件已存在，是否覆盖？\n" + target.getAbsolutePath(), "确认覆盖", JOptionPane.YES_NO_OPTION);
-            if (confirm != JOptionPane.YES_OPTION) return;
+            int confirm = JOptionPane.showConfirmDialog(this, "文件已存在，是否覆盖？\n" + target.getAbsolutePath(), "确认覆盖",
+                    JOptionPane.YES_NO_OPTION);
+            if (confirm != JOptionPane.YES_OPTION)
+                return;
         }
         try {
             contactService.exportVcfFile(target);
@@ -578,7 +593,8 @@ public class MainGUI extends JFrame {
      * 调用：{@link ContactService#findByGroup(String)}、{@link #displayContactList(List)}、{@link #refreshContactTable()}。
      */
     private void onGroupFilterChange() {
-        if (groupFilterCombo == null || groupFilterCombo.getSelectedItem() == null) return;
+        if (groupFilterCombo == null || groupFilterCombo.getSelectedItem() == null)
+            return;
         String name = groupFilterCombo.getSelectedItem().toString();
         if ("全部分组".equals(name)) {
             refreshContactTable();
@@ -631,7 +647,9 @@ public class MainGUI extends JFrame {
             JTextField name = new JTextField();
             JTextArea notes = new JTextArea(3, 20);
             notes.setLineWrap(true);
-            int res = JOptionPane.showConfirmDialog(dialog, new Object[]{"分组名称:", name, "备注:", new JScrollPane(notes)}, "新增分组", JOptionPane.OK_CANCEL_OPTION);
+            int res = JOptionPane.showConfirmDialog(dialog,
+                    new Object[] { "分组名称:", name, "备注:", new JScrollPane(notes) }, "新增分组",
+                    JOptionPane.OK_CANCEL_OPTION);
             if (res == JOptionPane.OK_OPTION) {
                 if (name.getText().trim().isEmpty()) {
                     displayMessage("分组名称不能为空");
@@ -651,8 +669,10 @@ public class MainGUI extends JFrame {
                 displayMessage("请选择要删除的分组");
                 return;
             }
-            int res = JOptionPane.showConfirmDialog(dialog, "确定删除分组：" + selected + " ?", "确认", JOptionPane.YES_NO_OPTION);
-            if (res != JOptionPane.YES_OPTION) return;
+            int res = JOptionPane.showConfirmDialog(dialog, "确定删除分组：" + selected + " ?", "确认",
+                    JOptionPane.YES_NO_OPTION);
+            if (res != JOptionPane.YES_OPTION)
+                return;
             contactService.deleteGroup(selected);
             refreshGroupFilter();
             list.setListData(toNameArray(contactService.findAllGroup()));
@@ -684,7 +704,7 @@ public class MainGUI extends JFrame {
         JButton close = new JButton("关闭");
         close.addActionListener(e -> dialog.dispose());
 
-        for (JButton b : new JButton[]{add, del, assign, close}) {
+        for (JButton b : new JButton[] { add, del, assign, close }) {
             b.setFocusPainted(false);
         }
         btnBar.add(add);
@@ -769,7 +789,7 @@ public class MainGUI extends JFrame {
         JButton close = new JButton("关闭");
         close.addActionListener(e -> dialog.dispose());
 
-        for (JButton b : new JButton[]{add, del, assign, close}) {
+        for (JButton b : new JButton[] { add, del, assign, close }) {
             b.setFocusPainted(false);
         }
         btnBar.add(add);
@@ -801,7 +821,8 @@ public class MainGUI extends JFrame {
         JTextArea notesArea = (JTextArea) form.getClientProperty("notesArea");
 
         JButton saveBtn = new JButton("保存");
-        saveBtn.addActionListener(e -> onAddButtonClick(dialog, nameField, phoneField, backupPhoneField, addressField, emailField, notesArea));
+        saveBtn.addActionListener(e -> onAddButtonClick(dialog, nameField, phoneField, backupPhoneField, addressField,
+                emailField, notesArea));
         JButton cancelBtn = new JButton("取消");
         cancelBtn.addActionListener(e -> dialog.dispose());
 
@@ -850,7 +871,8 @@ public class MainGUI extends JFrame {
         JTextArea notesArea = (JTextArea) form.getClientProperty("notesArea");
 
         JButton saveBtn = new JButton("保存");
-        saveBtn.addActionListener(e -> onEditButtonClick(dialog, contactId, nameField, phoneField, backupPhoneField, addressField, emailField, notesArea));
+        saveBtn.addActionListener(e -> onEditButtonClick(dialog, contactId, nameField, phoneField, backupPhoneField,
+                addressField, emailField, notesArea));
         JButton cancelBtn = new JButton("取消");
         cancelBtn.addActionListener(e -> dialog.dispose());
 
@@ -974,14 +996,14 @@ public class MainGUI extends JFrame {
 
     /**
      * 从数据库读取标签列表，组装成下拉框选项。
-     * 调用：{@link DBUtil#getConnection()}。
+     * 调用：{@link DatabaseUtil#getConnection()}。
      */
     private List<TagOption> loadTagOptions() {
         List<TagOption> list = new ArrayList<>();
         String sql = "select tag_color, tag_name from tags";
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DatabaseUtil.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 String color = rs.getString("tag_color");
                 String name = rs.getString("tag_name");
@@ -1032,7 +1054,8 @@ public class MainGUI extends JFrame {
      * 将分组列表转换成分组名数组（用于刷新 JList 之类的组件）。
      */
     private String[] toNameArray(List<Groups> groups) {
-        if (groups == null || groups.isEmpty()) return new String[0];
+        if (groups == null || groups.isEmpty())
+            return new String[0];
         return groups.stream().map(Groups::getGroup_name).toArray(String[]::new);
     }
 
