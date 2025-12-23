@@ -76,5 +76,14 @@ public class ValidationUtil {
             public static ValidationResult error(String message) {
                 return new ValidationResult(false, message);
             }
+
+        public boolean isValid() {
+            return valid;
         }
+
+        public String getMessage() {
+            return message;
+        }
+        }
+
 }
