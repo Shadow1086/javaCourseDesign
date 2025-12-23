@@ -19,7 +19,7 @@ public interface ContactService {
      *
      * @param name,tele1,tele2,home,email,notes
      */
-    void addContact(String name, String tele1, String tele2, String home, String email, String notes);
+    boolean addContact(String name, String tele1, String tele2, String home, String email, String notes);
 
     /**
      * 通过ID查询联系人

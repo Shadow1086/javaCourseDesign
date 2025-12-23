@@ -4,14 +4,14 @@ import com.cn.hbu.edu.htliang.dao.ContactsDao;
 import com.cn.hbu.edu.htliang.entityPojo.Contacts;
 import com.cn.hbu.edu.htliang.entityPojo.Groups;
 import com.cn.hbu.edu.htliang.entityPojo.Tags;
+import com.cn.hbu.edu.htliang.util.ValidationUtil;
+import com.cn.hbu.edu.htliang.util.ValidationUtil.ValidationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 类名: ContactsService
@@ -28,24 +28,28 @@ public class ContactServiceImpl implements ContactService {
     public ContactServiceImpl(ContactsDao contactsDao) {
         this.dao = contactsDao;
     }
+
     private static final Logger logger = LoggerFactory.getLogger(ContactServiceImpl.class);
     /**
      * 添加单个联系人
      * 姓名等所有信息都需要添加到形参，除了ID
      */
     @Override
-    public void addContact(String name, String tele1, String tele2, String home, String email, String notes) {
-        if (name == null) {
-            logger.warn("添加联系人失败：姓名不能为空");
-            return;
-        }
-        if (tele1 == null) {
-            logger.warn("添加联系人失败：电话不能为空");
-            return;
+    public boolean addContact(String name, String tele1, String tele2, String home, String email, String notes) {
+        ValidationResult result = ValidationUtil.validateContact(name, tele1, tele2, email);
+        if (!result.isValid()) {  //不合法的话
+            logger.error("添加联系人失败：{}", result.getMessage());
+            return false;
         }
         Contacts con = new Contacts(name, tele1, tele2, home, email, notes);
-        dao.insert(con);
-        logger.debug("添加联系人成功: {}", con);
+        try {
+            dao.insert(con);
+            logger.debug("添加联系人成功: {}", con);
+            return true;
+        } catch (Exception e) {
+            logger.error("添加联系人失败", e);
+            return false;
+        }
     }
 
     /**
@@ -84,10 +88,13 @@ public class ContactServiceImpl implements ContactService {
     * 通过手机号查询
     */
     public List<Contacts> findByTele(String tele) {
-        if (tele == null || tele.length() != 11 || !teleIsMactches(tele)) {
-            logger.warn("电话号码格式有误: {}", tele);
+        if (!ValidationUtil.isValidTele(tele)) {
+            //如果输入电话号不合法
+            logger.error("通过电话号查询联系人中输入电话号不合法");
+            return null;
+        } else {
+            return dao.findByTele(tele);
         }
-        return dao.findByTele(tele);
     }
 
     /**
@@ -115,12 +122,26 @@ public class ContactServiceImpl implements ContactService {
         }
         try {
             Contacts con = dao.findById(id);
-            if (newName == null) newName = con.getName();
-            if (newTele1 == null) newTele1 = con.getTele1();
-            if (newTele2 == null) newTele2 = con.getTele2();
-            if (newHome == null) newHome = con.getHome();
-            if (newEmail == null) newEmail = con.getEmail();
-            if (newNotes == null) newNotes = con.getNotes();
+            if (newName == null) {
+                newName = con.getName();
+            } else {
+                if (!ValidationUtil.isValidName(newName)) {
+                    logger.error("修改ID为：{} 的联系人失败，原因：姓名格式不正确", id);
+                    return false;
+                }
+            }
+            if (!ValidationUtil.isValidTele(newTele1)) {
+                logger.error("修改ID为：{}的联系人信息错误：原因：电话号格式错误", id);
+                return false;
+            }
+            if (!ValidationUtil.isValidTele(newTele2)) {
+                logger.error("修改ID为：{}的联系人信息错误：原因：电话号格式错误", id);
+                return false;
+            }
+            if (!ValidationUtil.isValidEmail(newEmail)) {
+                logger.error("修改ID为：{}的联系人信息错误：原因：邮箱格式错误", id);
+                return false;
+            }
             dao.updateInfo(id, newName, newTele1, newTele2, newHome, newEmail, newNotes);
             logger.debug("修改联系人成功, id={}", id);
             return true;
@@ -449,12 +470,4 @@ public class ContactServiceImpl implements ContactService {
         return writeVcfFile(file);
     }
 
-    /**
-     * 检查电话号的正则表达式
-     */
-    private boolean teleIsMactches(String tele) {
-        Pattern pattern = Pattern.compile("1\\d{10}");
-        Matcher matcher = pattern.matcher(tele);
-        return matcher.matches();
-    }
 }
