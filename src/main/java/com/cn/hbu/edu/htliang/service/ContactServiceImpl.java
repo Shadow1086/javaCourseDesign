@@ -1,6 +1,6 @@
 package com.cn.hbu.edu.htliang.service;
 
-import com.cn.hbu.edu.htliang.dao.ContactsDaoImpl;
+import com.cn.hbu.edu.htliang.dao.ContactsDao;
 import com.cn.hbu.edu.htliang.entityPojo.Contacts;
 import com.cn.hbu.edu.htliang.entityPojo.Groups;
 import com.cn.hbu.edu.htliang.entityPojo.Tags;
@@ -22,7 +22,12 @@ import java.util.regex.Pattern;
  * @author htLiang
  */
 public class ContactServiceImpl implements ContactService {
-    private final ContactsDaoImpl dao = new ContactsDaoImpl();
+    private final ContactsDao dao;
+
+    //工厂模式，由外部决定使用什么数据库，可以通过dao层控制切换数据库
+    public ContactServiceImpl(ContactsDao contactsDao) {
+        this.dao = contactsDao;
+    }
     private static final Logger logger = LoggerFactory.getLogger(ContactServiceImpl.class);
     /**
      * 添加单个联系人
