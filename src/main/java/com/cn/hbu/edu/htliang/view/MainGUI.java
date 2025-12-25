@@ -409,9 +409,9 @@ public class MainGUI extends JFrame {
     // ============ 事件处理 ============
 
     /**
-     * “添加联系人”对话框的保存按钮事件：
-     * 1) 读取输入 2) 做必填校验 3) 调用 service 写入数据库 4) 刷新表格。
-     * 调用：{@link ContactService#addContact(String, String, String, String, String, String)}、{@link #refreshContactTable()}。
+     * "添加联系人"对话框的保存按钮事件：
+     * 1) 读取输入 2) 调用 service 写入数据库（service 层负责验证） 3) 刷新表格。
+     * 调用：{@link ContactService#addContact(Contacts)}、{@link #refreshContactTable()}。
      */
     private void onAddButtonClick(JDialog dialog,
             JTextField nameField,
@@ -420,23 +420,27 @@ public class MainGUI extends JFrame {
             JTextField addressField,
             JTextField emailField,
             JTextArea notesArea) {
+        logger.debug("开始添加联系人");
         Contacts contact = collectAddContactInput(nameField, phoneField, backupPhoneField, addressField, emailField,
                 notesArea);
-        if (contact.getName().isEmpty() || contact.getTele1().isEmpty()) {
-            JOptionPane.showMessageDialog(dialog, "姓名和电话不能为空！", "错误", JOptionPane.ERROR_MESSAGE);
+        
+        boolean success = contactService.addContact(contact);
+        if (!success) {
+            logger.warn("添加联系人失败：验证未通过或数据库操作失败");
+            JOptionPane.showMessageDialog(dialog, "添加失败，请检查输入格式（姓名和电话必填，电话/邮箱格式需正确）", "错误", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        contactService.addContact(contact.getName(), contact.getTele1(), contact.getTele2(), contact.getHome(),
-                contact.getEmail(), contact.getNotes());
+        
+        logger.info("添加联系人成功: {}", contact.getName());
         refreshContactTable();
         displayMessage("添加成功");
         dialog.dispose();
     }
 
     /**
-     * “编辑联系人”对话框的保存按钮事件：
-     * 1) 读取输入 2) 必填校验 3) 调用 service 更新 4) 刷新表格。
-     * 调用：{@link ContactService#updateContactInfo(int, String, String, String, String, String, String)}、{@link #refreshContactTable()}。
+     * "编辑联系人"对话框的保存按钮事件：
+     * 1) 读取输入 2) 调用 service 更新（service 层负责验证） 3) 刷新表格。
+     * 调用：{@link ContactService#updateContactInfo(Contacts)}、{@link #refreshContactTable()}。
      */
     private void onEditButtonClick(JDialog dialog,
             int contactId,
@@ -446,18 +450,18 @@ public class MainGUI extends JFrame {
             JTextField addressField,
             JTextField emailField,
             JTextArea notesArea) {
+        logger.debug("开始更新联系人, id={}", contactId);
         Contacts contact = collectEditContactInput(contactId, nameField, phoneField, backupPhoneField, addressField,
                 emailField, notesArea);
-        if (contact.getName().isEmpty() || contact.getTele1().isEmpty()) {
-            JOptionPane.showMessageDialog(dialog, "姓名和电话不能为空！", "错误", JOptionPane.ERROR_MESSAGE);
+        
+        boolean success = contactService.updateContactInfo(contact);
+        if (!success) {
+            logger.warn("更新联系人失败, id={}", contactId);
+            JOptionPane.showMessageDialog(dialog, "更新失败，请检查输入格式（姓名和电话必填，电话/邮箱格式需正确）", "错误", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        boolean ok = contactService.updateContactInfo(contactId, contact.getName(), contact.getTele1(),
-                contact.getTele2(), contact.getHome(), contact.getEmail(), contact.getNotes());
-        if (!ok) {
-            displayMessage("更新失败，未找到联系人或数据有误");
-            return;
-        }
+        
+        logger.info("更新联系人成功, id={}, name={}", contactId, contact.getName());
         refreshContactTable();
         displayMessage("更新成功");
         dialog.dispose();
