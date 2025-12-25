@@ -20,7 +20,7 @@ public interface ContactService {
      *
      * @param name,tele1,tele2,home,email,notes
      */
-    boolean addContact(String name, String tele1, String tele2, String home, String email, String notes);
+    boolean addContact(Contacts con);
 
     /**
      * 通过ID查询联系人
@@ -50,8 +50,7 @@ public interface ContactService {
     /**
      * 根据ID来更改联系人信息
      */
-    boolean updateContactInfo(int id, String newName, String newTele1, String newTele2, String newHome, String newEmail,
-            String newNotes);
+    boolean updateContactInfo(Contacts con);
 
     // 分组操作
 

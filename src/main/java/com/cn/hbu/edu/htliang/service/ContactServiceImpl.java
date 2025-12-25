@@ -36,14 +36,13 @@ public class ContactServiceImpl implements ContactService {
      * 姓名等所有信息都需要添加到形参，除了ID
      */
     @Override
-    public boolean addContact(String name, String tele1, String tele2, String home, String email, String notes) {
-        ValidationResult result = ValidationUtil.validateContact(name, tele1, tele2, email);
+    public boolean addContact(Contacts con) {
+        ValidationResult result = ValidationUtil.validateContact(con.getName(), con.getTele1(),con.getTele2(),con.getEmail());
         if (!result.isValid()) { // 不合法的话
             logger.error("添加联系人失败：{}", result.getMessage());
             return false;
         }
-        Contacts con = new Contacts(name, tele1, tele2, home, email, notes);
-        try {
+                try {
             dao.insert(con);
             logger.debug("添加联系人成功: {}", con);
             return true;
@@ -121,12 +120,14 @@ public class ContactServiceImpl implements ContactService {
      * 根据ID修改联系人信息
      */
     @Override
-    public boolean updateContactInfo(int id, String newName, String newTele1, String newTele2, String newHome,
-            String newEmail, String newNotes) {
-        if (!dao.exists(id)) {
-            logger.warn("修改失败，未找到ID为{}的联系人", id);
-            return false;
-        }
+    public boolean updateContactInfo(Contacts con) {
+        int id = con.getId();
+        String newName = con.getName();
+        String newTele1 = con.getTele1();
+        String newTele2 = con.getTele2();
+        String newEmail = con.getEmail();
+        String newHome = con.getHome();
+        String newNotes  = con.getNotes();
         try {
             if (!ValidationUtil.isValidName(newName)) {
                 logger.error("修改ID为：{} 的联系人失败，原因：姓名格式不正确", id);
