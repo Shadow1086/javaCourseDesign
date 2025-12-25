@@ -37,7 +37,7 @@ build/
 
 ### Logs ###
 logs/
-
+appLogs/
 .spec-workflow
 .serena
 .qoder
