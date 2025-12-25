@@ -24,10 +24,14 @@ public class ContactServiceImplTest {
         FakeContactsDao dao = new FakeContactsDao();
         ContactServiceImpl service = new ContactServiceImpl(dao);
 
-        assertFalse(service.addContact("A", "13800138000", null, null, null, null));
+        // 测试无效姓名
+        Contacts invalidContact = new Contacts("A", "13800138000", null, null, null, null);
+        assertFalse(service.addContact(invalidContact));
         assertEquals(0, dao.inserted.size());
 
-        assertTrue(service.addContact("张三", "13800138000", null, "Beijing", "user@example.com", "notes"));
+        // 测试有效联系人
+        Contacts validContact = new Contacts("张三", "13800138000", null, "Beijing", "user@example.com", "notes");
+        assertTrue(service.addContact(validContact));
         assertEquals(1, dao.inserted.size());
     }
 
@@ -68,16 +72,35 @@ public class ContactServiceImplTest {
         FakeContactsDao dao = new FakeContactsDao();
         ContactServiceImpl service = new ContactServiceImpl(dao);
 
-        assertFalse(service.updateContactInfo(1, "张三", "13800138000", null, null, null, null));
+        // 测试更新不存在的联系人
+        Contacts nonExistent = new Contacts("张三", "13800138000", null, null, null, null);
+        nonExistent.setId(1);
+        assertFalse(service.updateContactInfo(nonExistent));
 
+        // 插入一个联系人
         Contacts c = new Contacts("张三", "13800138000", null, null, null, null);
         dao.insert(c);
 
-        assertFalse(service.updateContactInfo(c.getId(), "A", "13800138000", null, null, null, null));
-        assertFalse(service.updateContactInfo(c.getId(), "张三", "123", null, null, null, null));
-        assertFalse(service.updateContactInfo(c.getId(), "张三", "13800138000", null, null, "bad@", null));
+        // 测试无效姓名
+        Contacts invalidName = new Contacts("A", "13800138000", null, null, null, null);
+        invalidName.setId(c.getId());
+        assertFalse(service.updateContactInfo(invalidName));
+        
+        // 测试无效电话
+        Contacts invalidPhone = new Contacts("张三", "123", null, null, null, null);
+        invalidPhone.setId(c.getId());
+        assertFalse(service.updateContactInfo(invalidPhone));
+        
+        // 测试无效邮箱
+        Contacts invalidEmail = new Contacts("张三", "13800138000", null, null, "bad@", null);
+        invalidEmail.setId(c.getId());
+        assertFalse(service.updateContactInfo(invalidEmail));
 
-        assertTrue(service.updateContactInfo(c.getId(), "李四", "13900139000", "13800138000", "Shanghai", "lisi@example.com", "memo"));
+        // 测试有效更新
+        Contacts validUpdate = new Contacts("李四", "13900139000", "13800138000", "Shanghai", "lisi@example.com", "memo");
+        validUpdate.setId(c.getId());
+        assertTrue(service.updateContactInfo(validUpdate));
+        
         Contacts updated = dao.findById(c.getId());
         assertEquals("李四", updated.getName());
         assertEquals("13900139000", updated.getTele1());
