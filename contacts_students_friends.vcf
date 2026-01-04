@@ -1,0 +1,37 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Zhao;Ming;;;
+TEL;TYPE=CELL:13800000001
+TEL;TYPE=WORK:0311-5551001
+EMAIL:ming.zhao@example.com
+ADR;TYPE=HOME:;;No.1 North Road;Shijiazhuang;Hebei;050000;China
+NOTE:Classmate from CS101. X-GROUP : Classmates X-TAG : Study
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+N:Li;Anna;;;
+TEL;TYPE=CELL:13800000002
+EMAIL:anna.li@example.com
+ADR;TYPE=HOME:;;No.8 West Street;Shijiazhuang;Hebei;050001;China
+NOTE:Study partner. X-GROUP : Friends X-TAG : Favorite
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+N:Wang;Eric;;;
+TEL;TYPE=CELL:13800000003
+TEL;TYPE=HOME:0311-5551003
+EMAIL:eric.wang@example.com
+ADR;TYPE=HOME:;;No.12 South Avenue;Shijiazhuang;Hebei;050002;China
+NOTE:Robotics club. X-GROUP : Clubs X-TAG : Project
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+N:Chen;Lily;;;
+TEL;TYPE=CELL:13800000004
+EMAIL:lily.chen@example.com
+ADR;TYPE=HOME:;;No.20 East Lane;Shijiazhuang;Hebei;050003;China
+NOTE:Volleyball team. X-GROUP : Friends X-TAG : Sports
+END:VCARD
