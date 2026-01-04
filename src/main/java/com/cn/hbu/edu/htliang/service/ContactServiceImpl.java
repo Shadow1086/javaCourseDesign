@@ -38,17 +38,21 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public boolean addContact(Contacts con) {
         ValidationResult result = ValidationUtil.validateContact(con.getName(), con.getTele1(),con.getTele2(),con.getEmail());
-        if (!result.isValid()) { // 不合法的话
+        if (!result.isValid()) {
             logger.error("添加联系人失败：{}", result.getMessage());
-            return false;
+            throw new RuntimeException(result.getMessage());
         }
-                try {
+        try {
             dao.insert(con);
             logger.debug("添加联系人成功: {}", con);
             return true;
         } catch (Exception e) {
             logger.error("添加联系人失败", e);
-            return false;
+            String errorMsg = e.getMessage();
+            if (errorMsg != null && errorMsg.contains("UNIQUE constraint failed")) {
+                throw new RuntimeException("手机号已存在，请使用其他手机号");
+            }
+            throw new RuntimeException("添加联系人失败：" + (errorMsg != null ? errorMsg : "数据库操作异常"));
         }
     }
 
@@ -131,27 +135,33 @@ public class ContactServiceImpl implements ContactService {
         try {
             if (!ValidationUtil.isValidName(newName)) {
                 logger.error("修改ID为：{} 的联系人失败，原因：姓名格式不正确", id);
-                return false;
+                throw new RuntimeException("联系人姓名格式不正确，请重新检查");
             }
             if (!ValidationUtil.isValidTele(newTele1)) {
                 logger.error("修改ID为：{}的联系人信息错误：原因：电话号格式错误", id);
-                return false;
+                throw new RuntimeException("联系人电话号格式不正确，请重新检查");
             }
             if (newTele2 != null && !newTele2.isBlank() && !ValidationUtil.isValidTele(newTele2)) {
-                logger.error("修改ID为：{}的联系人信息错误：原因：电话号格式错误", id);
-                return false;
+                logger.error("修改ID为：{}的联系人信息错误：原因：备用电话号格式错误", id);
+                throw new RuntimeException("备用电话号格式不正确，请重新检查");
             }
 
             if (newEmail != null && !newEmail.isBlank() && !ValidationUtil.isValidEmail(newEmail)) {
                 logger.error("修改ID为：{}的联系人信息错误：原因：邮箱格式错误", id);
-                return false;
+                throw new RuntimeException("联系人邮箱格式不正确，请重新检查");
             }
             dao.updateInfo(id, newName, newTele1, newTele2, newHome, newEmail, newNotes);
             logger.debug("修改联系人成功, id={}", id);
             return true;
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             logger.error("修改联系人信息失败, id={}", id, e);
-            return false;
+            String errorMsg = e.getMessage();
+            if (errorMsg != null && errorMsg.contains("UNIQUE constraint failed")) {
+                throw new RuntimeException("手机号已存在，请使用其他手机号");
+            }
+            throw new RuntimeException("修改联系人失败：" + (errorMsg != null ? errorMsg : "数据库操作异常"));
         }
     }
 
@@ -423,7 +433,7 @@ public class ContactServiceImpl implements ContactService {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
             List<String> list = dao.writeVcfFileInService(bw);
             for (String str : list) {
-                String[] part = str.split(",");
+                String[] part = str.split(";");
                 bw.write("\nBEGIN:VCARD\nVERSION:3.0\nFN:" + part[0] +
                         "\nTEL:" + part[1] + "\n");
                 writeProp(bw, "TEL", part[2]);

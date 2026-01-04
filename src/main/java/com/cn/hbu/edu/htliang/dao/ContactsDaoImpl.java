@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedWriter;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -512,31 +513,37 @@ public class ContactsDaoImpl implements ContactsDao {
     @Override
     public List<String> writeVcfFileInService(BufferedWriter bw) {
         List<String> resultList = new ArrayList<>();
-        String sql = """
-                SELECT c.name, c.tele1, c.tele2, c.home, c.email, c.notes, g.group_name, t.tag_name
+        String sqlForGroup = """
+                SELECT c.name, c.tele1, c.tele2, c.home, c.email, c.notes,
+                GROUP_CONCAT(DISTINCT g.group_name , ',' ) as groups,
+                GROUP_CONCAT(DISTINCT t.tag_name || '(',t.tag_color || ')' ,',') as tags
                 FROM contacts c
                 LEFT JOIN contacts_group cg ON c.id = cg.contacts_id
                 LEFT JOIN groups g ON g.id = cg.group_id
                 LEFT JOIN tag_contacts tc ON c.id = tc.contacts_id
                 LEFT JOIN tags t ON t.id = tc.tag_id
+                GROUP BY c.id;
                 """;
+
         try (Connection conn = DatabaseUtil.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
+                PreparedStatement ps = conn.prepareStatement(sqlForGroup);
                 ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                String line = rs.getString(1) + "," +
-                        rs.getString(2) + "," +
-                        rs.getString(3) + "," +
-                        rs.getString(4) + "," +
-                        rs.getString(5) + "," +
-                        rs.getString(6) + "," +
-                        rs.getString(7) + "," +
-                        rs.getString(8);
-                resultList.add(line);
+                StringBuilder line = new StringBuilder();
+                line.append(rs.getString("name")).append(";");
+                line.append(rs.getString("tele1")).append(";");
+                line.append(rs.getString("tele2")).append(";");
+                line.append(rs.getString("home")).append(";");
+                line.append(rs.getString("email")).append(";");
+                line.append(rs.getString("notes")).append(";");
+                String groups = rs.getString("groups");
+                String tags = rs.getString("tags");
+                line.append(groups != null ? groups : "").append(";");
+                line.append(tags != null ? tags : "").append("\n");
+                resultList.add(line.toString());
             }
         } catch (SQLException e) {
             logger.error("导出联系人到VCF失败:", e);
-            // throw new DataAccessException("导出联系人到VCF失败",e);
         }
         return resultList;
     }
