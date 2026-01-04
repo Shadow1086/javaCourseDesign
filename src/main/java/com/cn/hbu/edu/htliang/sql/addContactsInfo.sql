@@ -1,7 +1,17 @@
-
 -- ！！！ 慎重添加，当数据库中没有这些联系人记录时才可以执行该语句
- -- 基础联系人数据（1-10）
-  INSERT INTO contacts (name, tele1, tele2, home, email, notes) VALUES
+
+-- 清空关联表数据（必须先删除，因为有外键约束）
+DELETE FROM tag_contacts;
+DELETE FROM contacts_group;
+DELETE FROM contacts;
+DELETE FROM tags;
+DELETE FROM GROUPS;
+
+-- 重置自增ID计数器，确保新数据从1开始
+DELETE FROM sqlite_sequence WHERE name IN ('contacts', 'groups', 'tags', 'contacts_group', 'tag_contacts');
+
+-- 基础联系人数据（1-10）
+INSERT INTO contacts (name, tele1, tele2, home, email, notes) VALUES
   ('张三', '13800138001', '15900159001', '北京市朝阳区', 'zhangsan@example.com', '公司同事'),
   ('李四', '13800138002', NULL, '上海市浦东新区', 'lisi@example.com', '大学同学'),
   ('王五', '13800138003', '15900159002', '广州市天河区', 'wangwu@example.com', '健身房朋友'),
@@ -73,16 +83,8 @@
   ('orange', '待跟进', '需要跟进的联系人'),
   ('pink', '亲密', '亲密关系'),
   ('gray', '一般', '普通联系人');
-  -- 清空关联表数据
-  DELETE FROM tag_contacts;
-  DELETE FROM contacts_group;
-  DELETE FROM contacts;
-  DELETE FROM tags;
-  DELETE FROM GROUPS;
 
-
-
-  -- 联系人-分组关联（使用INSERT OR IGNORE）
+-- 联系人-分组关联（使用INSERT OR IGNORE）
   -- 家人分组
   INSERT OR IGNORE INTO contacts_group (group_id, contacts_id) VALUES
   (1, 1), (1, 2), (1, 10);
