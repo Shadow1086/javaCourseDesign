@@ -43,6 +43,9 @@ public class MainGUI extends JFrame {
     private JComboBox<String> groupFilterCombo;
     private JComboBox<TagOption> tagFilterCombo;
 
+    // 防止筛选器互相触发的标志位
+    private boolean isUpdatingFilters = false;
+
     /**
      * 主窗口构造器：初始化界面，并加载分组/标签下拉框与联系人表格数据。
      * 调用：{@link #initUI()}、{@link #refreshGroupFilter()}、{@link #refreshTagFilter()}、{@link #refreshContactTable()}。
@@ -82,7 +85,7 @@ public class MainGUI extends JFrame {
     }
 
     /**
-     * 构建顶部工具栏：包含“管理/文件”菜单、分组/标签筛选、搜索框。
+     * 构建顶部工具栏:包含"管理/文件"菜单、分组/标签筛选、搜索框。
      * 触发：导入/导出回调 {@link #onImportButtonClick()} / {@link #onExportButtonClick()}；
      * 筛选回调 {@link #onGroupFilterChange()} / {@link #onTagFilterChange()}；
      * 搜索回调 {@link #onSearchButtonClick()}。
@@ -116,8 +119,10 @@ public class MainGUI extends JFrame {
         tagFilterCombo.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
             String text = value == null ? "" : value.displayText();
             JLabel lbl = new JLabel(text);
+            lbl.setFont(new Font("微软雅黑", Font.PLAIN, 13));
             lbl.setOpaque(true);
             lbl.setBorder(new EmptyBorder(2, 6, 2, 6));
+            lbl.setPreferredSize(new Dimension(170, 28));
             if (isSelected) {
                 lbl.setBackground(new Color(225, 236, 255));
             } else {
@@ -423,18 +428,17 @@ public class MainGUI extends JFrame {
         logger.debug("开始添加联系人");
         Contacts contact = collectAddContactInput(nameField, phoneField, backupPhoneField, addressField, emailField,
                 notesArea);
-        
-        boolean success = contactService.addContact(contact);
-        if (!success) {
-            logger.warn("添加联系人失败：验证未通过或数据库操作失败");
-            JOptionPane.showMessageDialog(dialog, "添加失败，请检查输入格式（姓名和电话必填，电话/邮箱格式需正确）", "错误", JOptionPane.ERROR_MESSAGE);
-            return;
+
+        try {
+            contactService.addContact(contact);
+            logger.info("添加联系人成功: {}", contact.getName());
+            refreshContactTable();
+            displayMessage("添加成功");
+            dialog.dispose();
+        } catch (RuntimeException e) {
+            logger.warn("添加联系人失败：{}", e.getMessage());
+            JOptionPane.showMessageDialog(dialog, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
         }
-        
-        logger.info("添加联系人成功: {}", contact.getName());
-        refreshContactTable();
-        displayMessage("添加成功");
-        dialog.dispose();
     }
 
     /**
@@ -453,18 +457,17 @@ public class MainGUI extends JFrame {
         logger.debug("开始更新联系人, id={}", contactId);
         Contacts contact = collectEditContactInput(contactId, nameField, phoneField, backupPhoneField, addressField,
                 emailField, notesArea);
-        
-        boolean success = contactService.updateContactInfo(contact);
-        if (!success) {
-            logger.warn("更新联系人失败, id={}", contactId);
-            JOptionPane.showMessageDialog(dialog, "更新失败，请检查输入格式（姓名和电话必填，电话/邮箱格式需正确）", "错误", JOptionPane.ERROR_MESSAGE);
-            return;
+
+        try {
+            contactService.updateContactInfo(contact);
+            logger.info("更新联系人成功, id={}, name={}", contactId, contact.getName());
+            refreshContactTable();
+            displayMessage("更新成功");
+            dialog.dispose();
+        } catch (RuntimeException e) {
+            logger.warn("更新联系人失败, id={}, 原因：{}", contactId, e.getMessage());
+            JOptionPane.showMessageDialog(dialog, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
         }
-        
-        logger.info("更新联系人成功, id={}, name={}", contactId, contact.getName());
-        refreshContactTable();
-        displayMessage("更新成功");
-        dialog.dispose();
     }
 
     /**
@@ -593,31 +596,45 @@ public class MainGUI extends JFrame {
     }
 
     /**
-     * 分组筛选下拉框变化事件：选择“全部分组”则显示全部；否则按分组查询并刷新表格。
+     * 分组筛选下拉框变化事件：选择"全部分组"则显示全部；否则按分组查询并刷新表格。
      * 调用：{@link ContactService#findByGroup(String)}、{@link #displayContactList(List)}、{@link #refreshContactTable()}。
      */
     private void onGroupFilterChange() {
-        if (groupFilterCombo == null || groupFilterCombo.getSelectedItem() == null)
+        if (isUpdatingFilters || groupFilterCombo == null || groupFilterCombo.getSelectedItem() == null)
             return;
         String name = groupFilterCombo.getSelectedItem().toString();
         if ("全部分组".equals(name)) {
             refreshContactTable();
             return;
         }
+        // 选择具体分组时，将标签重置为"全部标签"
+        isUpdatingFilters = true;
+        if (tagFilterCombo != null && tagFilterCombo.getSelectedIndex() != 0) {
+            tagFilterCombo.setSelectedIndex(0);
+        }
+        isUpdatingFilters = false;
         List<Contacts> contacts = contactService.findByGroup(name);
         displayContactList(contacts);
     }
 
     /**
-     * 标签筛选下拉框变化事件：选择“全部标签”则显示全部；否则按标签颜色查询并刷新表格。
+     * 标签筛选下拉框变化事件：选择"全部标签"则显示全部；否则按标签颜色查询并刷新表格。
      * 调用：{@link ContactService#findByTag(String)}、{@link #displayContactList(List)}、{@link #refreshContactTable()}。
      */
     private void onTagFilterChange() {
+        if (isUpdatingFilters)
+            return;
         TagOption option = tagFilterCombo == null ? null : (TagOption) tagFilterCombo.getSelectedItem();
         if (option == null || option.color == null) {
             refreshContactTable();
             return;
         }
+        // 选择具体标签时，将分组重置为"全部分组"
+        isUpdatingFilters = true;
+        if (groupFilterCombo != null && groupFilterCombo.getSelectedIndex() != 0) {
+            groupFilterCombo.setSelectedIndex(0);
+        }
+        isUpdatingFilters = false;
         List<Contacts> contacts = contactService.findByTag(option.color);
         displayContactList(contacts);
     }
