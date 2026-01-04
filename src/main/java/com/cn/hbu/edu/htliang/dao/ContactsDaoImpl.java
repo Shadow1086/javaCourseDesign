@@ -535,7 +535,7 @@ public class ContactsDaoImpl implements ContactsDao {
                 resultList.add(line);
             }
         } catch (SQLException e) {
-            logger.error("导出联系人到VCF失败", e);
+            logger.error("导出联系人到VCF失败:", e);
             // throw new DataAccessException("导出联系人到VCF失败",e);
         }
         return resultList;

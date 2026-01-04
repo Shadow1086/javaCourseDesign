@@ -353,7 +353,8 @@ public class ContactServiceImpl implements ContactService {
         if (line.startsWith("VERSION:")) {
         } else if (line.startsWith("N:") || line.startsWith("N;")) {
             String name = "";
-            String[] nameList = line.split(";", -1);
+            String nameWithN = line.split(":", -1)[1];
+            String[] nameList = nameWithN.split(";", -1);
             for (String part : nameList) {
                 name += part;
             }
@@ -374,7 +375,6 @@ public class ContactServiceImpl implements ContactService {
                         con.setNotes("备注电话号：" + value);
                     }
                 }
-
             } else if (line.toUpperCase().contains("WORK")) {
                 con.setTele1(value);
             }
