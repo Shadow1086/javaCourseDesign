@@ -25,7 +25,7 @@ CREATE TABLE contacts (
     email varchar(50),
     notes varchar(200),
     created_at datetime DEFAULT CURRENT_TIMESTAMP,
-    updated_at datetime DEFAULT CURRENT_TIMESTAMP
+    updated_at datetime
 );
 -- 添加触发器
 create trigger update_contacts_timestamp
@@ -41,7 +41,7 @@ CREATE INDEX idx_contacts_tele2 ON contacts (tele2);
 
 CREATE TABLE GROUPS (
     id integer PRIMARY KEY autoincrement,
-    group_name varchar(40) NOT NULL,
+    group_name varchar(40) NOT NULL UNIQUE,
     group_notes varchar(50)
 );
 
@@ -57,8 +57,8 @@ CREATE INDEX idx_groups_group_name ON GROUPS (group_name);
 
 CREATE TABLE tags (
     id integer PRIMARY KEY autoincrement,
-    tag_color varchar(10) NOT NULL,
-    tag_name varchar(40),
+    tag_color varchar(10) NOT NULL UNIQUE,
+    tag_name varchar(40) UNIQUE,
     tag_notes varchar(50)
 );
 
