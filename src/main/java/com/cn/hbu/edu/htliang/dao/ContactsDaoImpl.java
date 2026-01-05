@@ -494,7 +494,7 @@ public class ContactsDaoImpl implements ContactsDao {
      * 从ResultSet中获取Contact对象
      */
     private Contacts getContactsFromRsNext(ResultSet rs) throws SQLException {
-        return new Contacts(
+        Contacts contact = new Contacts(
                 rs.getInt("id"),
                 rs.getString("name"),
                 rs.getString("tele1"),
@@ -502,6 +502,27 @@ public class ContactsDaoImpl implements ContactsDao {
                 rs.getString("home"),
                 rs.getString("email"),
                 rs.getString("notes"));
+
+        // 尝试读取时间字段（如果SQL查询中包含这些字段）
+        try {
+            java.sql.Timestamp createdTs = rs.getTimestamp("created_at");
+            if (createdTs != null) {
+                contact.setCreatedAt(createdTs.toLocalDateTime());
+            }
+        } catch (SQLException e) {
+            // 如果查询中没有created_at字段，忽略
+        }
+
+        try {
+            java.sql.Timestamp updatedTs = rs.getTimestamp("updated_at");
+            if (updatedTs != null) {
+                contact.setUpdatedAt(updatedTs.toLocalDateTime());
+            }
+        } catch (SQLException e) {
+            // 如果查询中没有updated_at字段，忽略
+        }
+
+        return contact;
     }
 
     /**

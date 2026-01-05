@@ -1,5 +1,6 @@
 package com.cn.hbu.edu.htliang.entityPojo;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -19,6 +20,8 @@ public class Contacts {
     private String home;
     private String email;
     private String notes;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     private List<Groups> groups;
     private List<Tags> tags;
@@ -115,6 +118,22 @@ public class Contacts {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     @Override
