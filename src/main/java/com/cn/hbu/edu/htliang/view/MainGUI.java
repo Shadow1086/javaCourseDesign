@@ -12,6 +12,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -19,6 +21,8 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -173,7 +177,7 @@ public class MainGUI extends JFrame {
      * 表格数据刷新入口：{@link #refreshContactTable()} / {@link #displayContactList(List)}。
      */
     private JScrollPane buildContactTablePanel() {
-        String[] columnNames = { "ID", "姓名", "电话", "备用电话", "分组", "标签", "备注" };
+        String[] columnNames = { "ID", "姓名", "电话", "备用电话", "分组", "标签", "备注", "创建时间", "修改时间" };
         contactTableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -191,6 +195,11 @@ public class MainGUI extends JFrame {
         contactTable.getTableHeader().setBackground(new Color(243, 245, 248));
         contactTable.getTableHeader().setPreferredSize(new Dimension(0, 34));
         contactTable.setShowVerticalLines(false);
+
+        // 隐藏ID列（设置列宽为0，但保留在模型中供内部使用）
+        contactTable.getColumnModel().getColumn(0).setMinWidth(0);
+        contactTable.getColumnModel().getColumn(0).setMaxWidth(0);
+        contactTable.getColumnModel().getColumn(0).setWidth(0);
 
         rightClickMenu = new JPopupMenu();
         JMenuItem viewItem = new JMenuItem("查看详情");
@@ -363,6 +372,8 @@ public class MainGUI extends JFrame {
             }
             String groupNames = joinGroupNames(enriched);
             String tagNames = joinTagNames(enriched);
+            String createdAt = formatDateTime(enriched.getCreatedAt());
+            String updatedAt = formatDateTime(enriched.getUpdatedAt());
             contactTableModel.addRow(new Object[] {
                     enriched.getId(),
                     enriched.getName(),
@@ -370,9 +381,13 @@ public class MainGUI extends JFrame {
                     enriched.getTele2(),
                     groupNames,
                     tagNames,
-                    enriched.getNotes()
+                    enriched.getNotes(),
+                    createdAt,
+                    updatedAt
             });
         }
+        // 自动调整列宽
+        adjustColumnWidths();
     }
 
     /**
@@ -1069,6 +1084,62 @@ public class MainGUI extends JFrame {
             }
         }
         return joiner.length() == 0 ? "" : joiner.toString();
+    }
+
+    /**
+     * 格式化LocalDateTime为字符串显示。
+     */
+    private String formatDateTime(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return "";
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return dateTime.format(formatter);
+    }
+
+    /**
+     * 根据内容自动调整表格列宽。
+     */
+    private void adjustColumnWidths() {
+        if (contactTable == null || contactTableModel == null) {
+            return;
+        }
+
+        TableColumnModel columnModel = contactTable.getColumnModel();
+        int columnCount = contactTable.getColumnCount();
+
+        for (int col = 0; col < columnCount; col++) {
+            // 跳过ID列（已隐藏）
+            if (col == 0) {
+                continue;
+            }
+
+            TableColumn column = columnModel.getColumn(col);
+            int maxWidth = 50; // 最小宽度
+
+            // 计算表头宽度
+            Object headerValue = column.getHeaderValue();
+            if (headerValue != null) {
+                FontMetrics fm = contactTable.getFontMetrics(contactTable.getTableHeader().getFont());
+                int headerWidth = fm.stringWidth(headerValue.toString()) + 20;
+                maxWidth = Math.max(maxWidth, headerWidth);
+            }
+
+            // 计算内容宽度
+            int rowCount = contactTableModel.getRowCount();
+            FontMetrics fm = contactTable.getFontMetrics(contactTable.getFont());
+            for (int row = 0; row < rowCount; row++) {
+                Object value = contactTableModel.getValueAt(row, col);
+                if (value != null) {
+                    int cellWidth = fm.stringWidth(value.toString()) + 20;
+                    maxWidth = Math.max(maxWidth, cellWidth);
+                }
+            }
+
+            // 设置最大宽度限制，避免某些列过宽
+            maxWidth = Math.min(maxWidth, 300);
+            column.setPreferredWidth(maxWidth);
+        }
     }
 
     /**
