@@ -24,15 +24,15 @@ CREATE TABLE contacts (
     home varchar(100),
     email varchar(50),
     notes varchar(200),
-    created_at datetime DEFAULT CURRENT_TIMESTAMP,
+    created_at datetime DEFAULT (datetime('now','localtime')),
     updated_at datetime
 );
 -- 添加触发器
-create trigger update_contacts_timestamp
-    after update on contacts
-begin
-    update contacts set updated_at = current_timestamp
-        where id = new.id;
+CREATE TRIGGER update_contacts_timestamp
+    AFTER UPDATE ON contacts
+BEGIN
+    UPDATE contacts SET updated_at = datetime('now','localtime')
+        WHERE id = new.id;
 end;
 
 CREATE INDEX idx_contacts_name ON contacts (name);
