@@ -82,5 +82,5 @@ public interface ContactsDao {
     List<Tags> findTagsByContact(int id);
 
     // 将数据库中的所有联系人信息按行字符串的格式储存在list<String>中，便于导出联系人
-    List<String> writeVcfFileInService(BufferedWriter bw);
+    List<String> writeVcfFileInService();
 }

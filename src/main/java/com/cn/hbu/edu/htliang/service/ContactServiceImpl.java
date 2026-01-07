@@ -431,7 +431,7 @@ public class ContactServiceImpl implements ContactService {
      */
     public File writeVcfFile(File file) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
-            List<String> list = dao.writeVcfFileInService(bw);
+            List<String> list = dao.writeVcfFileInService();
             for (String str : list) {
                 String[] part = str.split(";");
                 bw.write("\nBEGIN:VCARD\nVERSION:3.0\nFN:" + part[0] +

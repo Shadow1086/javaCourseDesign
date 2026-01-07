@@ -532,18 +532,18 @@ public class ContactsDaoImpl implements ContactsDao {
      * @param bw : 从FileVcf中被调用
      */
     @Override
-    public List<String> writeVcfFileInService(BufferedWriter bw) {
+    public List<String> writeVcfFileInService() {
         List<String> resultList = new ArrayList<>();
         String sqlForGroup = """
                 SELECT c.name, c.tele1, c.tele2, c.home, c.email, c.notes,
-                GROUP_CONCAT(DISTINCT g.group_name , ',' ) as groups,
-                GROUP_CONCAT(DISTINCT t.tag_name || '(',t.tag_color || ')' ,',') as tags
+                GROUP_CONCAT(DISTINCT g.group_name) as groups,
+                GROUP_CONCAT(DISTINCT (t.tag_name || '(' || t.tag_color || ')')) as tags
                 FROM contacts c
                 LEFT JOIN contacts_group cg ON c.id = cg.contacts_id
                 LEFT JOIN groups g ON g.id = cg.group_id
                 LEFT JOIN tag_contacts tc ON c.id = tc.contacts_id
                 LEFT JOIN tags t ON t.id = tc.tag_id
-                GROUP BY c.id;
+                GROUP BY c.id,c.name,c.tele1,c.tele2,c.home,c.email,c.notes;
                 """;
 
         try (Connection conn = DatabaseUtil.getConnection();
@@ -551,16 +551,20 @@ public class ContactsDaoImpl implements ContactsDao {
                 ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 StringBuilder line = new StringBuilder();
+
                 line.append(rs.getString("name")).append(";");
                 line.append(rs.getString("tele1")).append(";");
                 line.append(rs.getString("tele2")).append(";");
                 line.append(rs.getString("home")).append(";");
                 line.append(rs.getString("email")).append(";");
                 line.append(rs.getString("notes")).append(";");
+
                 String groups = rs.getString("groups");
                 String tags = rs.getString("tags");
+
                 line.append(groups != null ? groups : "").append(";");
                 line.append(tags != null ? tags : "").append("\n");
+
                 resultList.add(line.toString());
             }
         } catch (SQLException e) {
