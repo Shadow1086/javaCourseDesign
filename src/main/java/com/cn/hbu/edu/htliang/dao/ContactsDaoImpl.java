@@ -44,6 +44,7 @@ public class ContactsDaoImpl implements ContactsDao {
             }
         } catch (SQLException e) {
             logger.error("插入联系人失败: {}", con.getName(), e);
+            throw new RuntimeException(e);
         }
     }
 
